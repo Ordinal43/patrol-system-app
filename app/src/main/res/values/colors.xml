@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3e92cc</color>
+    <color name="colorPrimaryDark">#2a628f</color>
+    <color name="colorAccent">#13293d</color>
+    <color name="colorWhite">#FFF</color>
+    <color name="colorBlack">#000</color>
+    <color name="colorGrey">#BDBDBD</color>
+
+    <!-- for texts -->
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#757575</color>
+
+    <!-- for material card component -->
+    <color name="transparent">#00000000</color>
+    <color name="card_background">#ffffff</color>
+    <color name="card_shadow_1">#d4d4d4</color>
+    <color name="card_shadow_2">#dddddd</color>
+    <color name="card_detailing">#eee</color>
+
+    <!-- for recycler -->
+    <color name="belum">#E53935</color>
+    <color name="sudah">#43A047</color>
+</resources>

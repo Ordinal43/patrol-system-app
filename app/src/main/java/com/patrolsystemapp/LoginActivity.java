@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.patrolsystemapp.Utils.IpDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,12 +30,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialogListener {
     private Context mContext;
     private ProgressBar progressBar;
     private EditText edtUsername;
     private EditText edtPassword;
     private Button btnLogin;
+
+    private TextView txtIp;
+    String ipAddress = new String("192.168.43.202:8000");
+    private Button btnIp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +56,13 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername = (EditText) findViewById(R.id.edtUsername);
         edtPassword = (EditText) findViewById(R.id.edtPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
+        txtIp = (TextView) findViewById(R.id.txtIp);
+        txtIp.setText("192.168.43.202:8000");
+        btnIp = (Button) findViewById(R.id.btnIp);
+
+        btnIp.setOnClickListener(v -> {
+            openDialog();
+        });
 
         edtUsername.requestFocus();
 
@@ -57,11 +71,19 @@ public class LoginActivity extends AppCompatActivity {
             String password = edtPassword.getText().toString();
 
             if (username.equals("") || password.equals("")) {
-                Toast.makeText(mContext, "Semua field harus diisi!.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Semua field harus diisi!", Toast.LENGTH_SHORT).show();
             } else {
                 login(username, password);
             }
         });
+    }
+
+    private void openDialog() {
+        IpDialog ipDialog = new IpDialog();
+        Bundle b = new Bundle();
+        b.putString("ipAddress", ipAddress);
+        ipDialog.setArguments(b);
+        ipDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void login(String username, String password) {
@@ -79,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://192.168.43.202:8000" + "/api/login")
+                .url("http://" + ipAddress + "/api/login")
                 .post(requestBody)
                 .build();
 
@@ -87,6 +109,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -116,5 +143,11 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void applyTexts(String ip) {
+        ipAddress = ip;
+        txtIp.setText(ipAddress);
     }
 }

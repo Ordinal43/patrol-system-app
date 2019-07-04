@@ -31,6 +31,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialogListener {
+    private SharedPreferences sharedPrefs;
     private Context mContext;
     private ProgressBar progressBar;
     private EditText edtUsername;
@@ -38,7 +39,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private Button btnLogin;
 
     private TextView txtIp;
-    String ipAddress = new String("192.168.43.202:8000");
+    private String ipAddress;
     private Button btnIp;
 
     @Override
@@ -51,13 +52,28 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
 
     private void initWidgets() {
         mContext = LoginActivity.this;
+        sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
         edtUsername = (EditText) findViewById(R.id.edtUsername);
+
+        if (sharedPrefs.contains("login_username")) {
+            String login_username;
+            login_username = sharedPrefs.getString("login_username", "");
+            edtUsername.setText(login_username);
+        }
+
         edtPassword = (EditText) findViewById(R.id.edtPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
+
         txtIp = (TextView) findViewById(R.id.txtIp);
-        txtIp.setText("192.168.43.202:8000");
+        if (sharedPrefs.contains("ip_address")) {
+            ipAddress = sharedPrefs.getString("ip_address", "");
+        } else {
+            ipAddress = "1.2.3.4:8000";
+        }
+        txtIp.setText(ipAddress);
+
         btnIp = (Button) findViewById(R.id.btnIp);
 
         btnIp.setOnClickListener(v -> {
@@ -100,8 +116,9 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                 .addFormDataPart("password", password)
                 .build();
 
+        String url = "http://" + ipAddress;
         Request request = new Request.Builder()
-                .url("http://" + ipAddress + "/api/login")
+                .url(url + "/api/auth/login")
                 .post(requestBody)
                 .build();
 
@@ -127,7 +144,8 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
 
                     SharedPreferences.Editor editor = sharedPrefs.edit();
                     editor.putString("user_object", jsonString);
-                    editor.apply();
+                            editor.putString("login_username", username);
+                            editor.apply();
 
                     Intent intent = new Intent(mContext, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -149,5 +167,8 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     public void applyTexts(String ip) {
         ipAddress = ip;
         txtIp.setText(ipAddress);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString("ip_address", ipAddress);
+        editor.apply();
     }
 }

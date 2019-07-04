@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //    Shared preferences
     private SharedPreferences sharedPrefs;
 
+    private String ipAddress;
     @Override
     protected void onStart() {
         super.onStart();
@@ -78,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
+
+        ipAddress = sharedPrefs.getString("ip_address", "");
 
         if (sharedPrefs.contains("user_object")) {
             try {

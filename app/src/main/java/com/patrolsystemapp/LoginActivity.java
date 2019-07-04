@@ -136,22 +136,35 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String jsonString = response.body().string();
-                JSONObject userObj = null;
+                Log.d(TAG, "onResponse: " + jsonString);
                 try {
-                    userObj = new JSONObject(jsonString);
+                    JSONObject obj = new JSONObject(jsonString);
+                    boolean err = (Boolean) obj.get("error");
+                    if (!err) {
+                        if (obj.isNull("user")) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Username/Password salah!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            String user = obj.get("user").toString();
 
-                    SharedPreferences sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-
-                    SharedPreferences.Editor editor = sharedPrefs.edit();
-                    editor.putString("user_object", jsonString);
+                            SharedPreferences.Editor editor = sharedPrefs.edit();
+                            editor.putString("user_object", user);
                             editor.putString("login_username", username);
                             editor.apply();
 
-                    Intent intent = new Intent(mContext, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                            Intent intent = new Intent(mContext, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
 
-                } catch (JSONException e) {
+                    } else {
+                        throw new Exception("Error API!");
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
                     runOnUiThread(new Runnable() {
                         public void run() {

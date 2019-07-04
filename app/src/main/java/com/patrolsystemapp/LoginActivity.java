@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -15,7 +17,6 @@ import android.widget.Toast;
 
 import com.patrolsystemapp.Utils.IpDialog;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -30,7 +31,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialogListener {
+    private static final String TAG = "LoginActivity";
     private SharedPreferences sharedPrefs;
     private Context mContext;
     private ProgressBar progressBar;
@@ -103,6 +106,15 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     }
 
     private void login(String username, String password) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                progressBar.setVisibility(View.VISIBLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            }
+        });
+
+
         // use connectionSpecs so will work with regular HTTP
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
@@ -125,6 +137,13 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    }
+                });
+
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
                     public void run() {
@@ -135,6 +154,13 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    }
+                });
+
                 String jsonString = response.body().string();
                 Log.d(TAG, "onResponse: " + jsonString);
                 try {

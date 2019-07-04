@@ -15,6 +15,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,17 +32,33 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "MainActivity";
     private static Context mContext;
     private DrawerLayout drawer;
     //    Custom Mqtt Fragment
     private MqttHelper mqttHelper;
+
+
+    private ProgressBar progressBarLogout;
     private TextView txtName;
     private TextView txtUsername;
     //    Shared preferences
     private SharedPreferences sharedPrefs;
 
     private String ipAddress;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -58,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mContext = MainActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
+        progressBarLogout = (ProgressBar) findViewById(R.id.progressBarLogout);
+        progressBarLogout.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,15 +131,87 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new ScheduleFragment()).commit();
                 break;
             case R.id.nav_logout:
-                SharedPreferences.Editor ed = sharedPrefs.edit();
-                ed.remove("user_object");
-                ed.apply();
-                Intent intent = new Intent(mContext, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+                logout();
                 break;
         }
         return true;
+    }
+
+    private void logout() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                progressBarLogout.setVisibility(View.VISIBLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            }
+        });
+
+        // use connectionSpecs so will work with regular HTTP
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
+                .build();
+
+        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+
+        String url = "http://" + ipAddress;
+        Request request = new Request.Builder()
+                .url(url + "/api/auth/logout")
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBarLogout.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    }
+                });
+
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Logout Gagal!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBarLogout.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    }
+                });
+
+                String jsonString = response.body().string();
+                Log.d(TAG, "onResponse: " + jsonString);
+                try {
+                    JSONObject obj = new JSONObject(jsonString);
+                    boolean err = (Boolean) obj.get("error");
+                    if (!err) {
+                        SharedPreferences.Editor ed = sharedPrefs.edit();
+                        ed.remove("user_object");
+                        ed.apply();
+                        Intent intent = new Intent(mContext, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    } else {
+                        throw new Exception("Error API!");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override

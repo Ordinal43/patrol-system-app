@@ -111,6 +111,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String name = userObj.getString("name");
                 String username = userObj.getString("username");
 
+                // save master key into stored preferences
+                String masterKey = userObj.getString("master_key");
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString("master_key", masterKey);
+                editor.apply();
+
                 txtName.setText(name);
                 txtUsername.setText(username);
             } catch (JSONException e) {
@@ -196,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (!err) {
                         SharedPreferences.Editor ed = sharedPrefs.edit();
                         ed.remove("user_object");
+                        ed.remove("master_key");
                         ed.apply();
                         Intent intent = new Intent(mContext, LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

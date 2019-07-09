@@ -43,10 +43,21 @@
 
     </android.support.v4.widget.DrawerLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBarLogout"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerInParent="true" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/frameLoadingLogout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBlack"
+            android:alpha="0.3">
+        </LinearLayout>
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/progressBarLogout"
+            android:layout_gravity="center"/>
+    </FrameLayout>
 
 </RelativeLayout>

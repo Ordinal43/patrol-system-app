@@ -16,7 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,8 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //    Custom Mqtt Fragment
     private MqttHelper mqttHelper;
 
-
-    private ProgressBar progressBarLogout;
+    private FrameLayout frameLoadingLogout;
     private TextView txtName;
     private TextView txtUsername;
     //    Shared preferences
@@ -76,8 +75,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mContext = MainActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        progressBarLogout = (ProgressBar) findViewById(R.id.progressBarLogout);
-        progressBarLogout.setVisibility(View.GONE);
+
+        frameLoadingLogout = (FrameLayout) findViewById(R.id.frameLoadingLogout);
+        frameLoadingLogout.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void logout() {
         runOnUiThread(new Runnable() {
             public void run() {
-                progressBarLogout.setVisibility(View.VISIBLE);
+                frameLoadingLogout.setVisibility(View.VISIBLE);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                         WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             }
@@ -164,8 +164,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        progressBarLogout.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        frameLoadingLogout.setVisibility(View.VISIBLE);
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
                 });
 
@@ -181,8 +182,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(Call call, Response response) throws IOException {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        progressBarLogout.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        frameLoadingLogout.setVisibility(View.VISIBLE);
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
                 });
 

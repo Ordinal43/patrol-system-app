@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private static final String TAG = "LoginActivity";
     private SharedPreferences sharedPrefs;
     private Context mContext;
-    private ProgressBar progressBar;
+    private FrameLayout frameLoading;
     private EditText edtUsername;
     private EditText edtPassword;
     private Button btnLogin;
@@ -56,9 +56,11 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private void initWidgets() {
         mContext = LoginActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
+        frameLoading = (FrameLayout) findViewById(R.id.frameLoading);
+        frameLoading.setVisibility(View.GONE);
+
         edtUsername = (EditText) findViewById(R.id.edtUsername);
+
 
         if (sharedPrefs.contains("login_username")) {
             String login_username;
@@ -108,7 +110,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private void login(String username, String password) {
         runOnUiThread(new Runnable() {
             public void run() {
-                progressBar.setVisibility(View.VISIBLE);
+                frameLoading.setVisibility(View.VISIBLE);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                         WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             }
@@ -139,7 +141,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        progressBar.setVisibility(View.GONE);
+                        frameLoading.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
                 });
@@ -156,7 +158,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
             public void onResponse(Call call, Response response) throws IOException {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        progressBar.setVisibility(View.GONE);
+                        frameLoading.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
                 });

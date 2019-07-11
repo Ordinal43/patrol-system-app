@@ -15,8 +15,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -42,7 +40,7 @@ public class MqttHelper {
         //        list topics
         topics = new ArrayList<>();
         topics.addAll(Arrays.asList(
-                "scan", "tes", "wow"
+                "shift"
         ));
 
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
@@ -112,7 +110,7 @@ public class MqttHelper {
         try {
             mqttAndroidClient.publish(topic, new MqttMessage(message.getBytes()));
         } catch (MqttException ex) {
-            System.err.println("Exceptionst publishing");
+            System.err.println("Exception publishing");
             ex.printStackTrace();
         }
     }

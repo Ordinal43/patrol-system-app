@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String ipAddress;
 
+    // for fetching current schedule
+    private Handler mHandler;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -101,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         ipAddress = sharedPrefs.getString("ip_address", "");
+        mHandler = new Handler();
+        // start scheduler for fetching shifts
+        startRepeatingTask();
 
         if (sharedPrefs.contains("user_object")) {
             try {
@@ -247,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 Log.w("Debug", mqttMessage.toString());
-                Toast.makeText(mContext, "Message: " + mqttMessage.toString(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(mContext, "Message: " + mqttMessage.toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -275,10 +282,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void fetchSchedule() {
+        if (sharedPrefs.contains("user_object")) {
+            if(PatrolApp.isActivityVisible()) {
+                Toast.makeText(getApplicationContext(), "Dummy scheduler request!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                fetchSchedule(); //this function can change value of mInterval.
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, 10000);
+            }
+        }
+    };
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PatrolApp.activityResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PatrolApp.activityPaused();
+    }
+
     //    Don't forget to close the mqtt conection when logging out
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mqttHelper.destroy();
+        stopRepeatingTask();
+
     }
 }

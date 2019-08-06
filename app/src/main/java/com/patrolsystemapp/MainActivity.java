@@ -266,9 +266,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 String topic = "scan";
                 mqttHelper.publish(topic, result.getContents());
-//                Intent intent = new Intent(mContext, ScanResultActivity.class);
-//                intent.putExtra("TOKEN", result.getContents());
-//                startActivity(intent);
+                Intent intent = new Intent(mContext, ScanResultActivity.class);
+                intent.putExtra("TOKEN", result.getContents());
+                startActivity(intent);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

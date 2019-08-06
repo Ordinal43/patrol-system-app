@@ -72,11 +72,14 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         btnLogin = (Button) findViewById(R.id.btnLogin);
 
         txtIp = (TextView) findViewById(R.id.txtIp);
-        if (sharedPrefs.contains("ip_address")) {
-            ipAddress = sharedPrefs.getString("ip_address", "");
-        } else {
-            ipAddress = "1.2.3.4:8000";
+
+        if (!sharedPrefs.contains("ip_address")) {
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putString("ip_address", "1.2.3.4:8000");
+            editor.apply();
         }
+
+        ipAddress = sharedPrefs.getString("ip_address", "");
         txtIp.setText(ipAddress);
 
         btnIp = (Button) findViewById(R.id.btnIp);
@@ -187,7 +190,6 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }
-
                     } else {
                         throw new Exception("Error API!");
                     }

@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.patrolsystemapp.Fragments.HomeFragment;
-import com.patrolsystemapp.Fragments.ScheduleFragment;
+import com.patrolsystemapp.Utils.IpDialog;
 import com.patrolsystemapp.Utils.MqttHelper;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -45,7 +45,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, IpDialog.IpDialogListener {
     private static final String TAG = "MainActivity";
     private static Context mContext;
     private DrawerLayout drawer;
@@ -140,15 +140,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                         new HomeFragment()).commit();
                 break;
-            case R.id.nav_list:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                        new ScheduleFragment()).commit();
+            case R.id.nav_change_ip:
+                openDialog();
                 break;
             case R.id.nav_logout:
                 logout();
                 break;
         }
         return true;
+    }
+
+    private void openDialog() {
+        IpDialog ipDialog = new IpDialog();
+        Bundle b = new Bundle();
+        b.putString("ipAddress", ipAddress);
+        ipDialog.setArguments(b);
+        ipDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void logout() {
@@ -381,5 +388,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mqttHelper.destroy();
         stopRepeatingTask();
 
+    }
+
+    @Override
+    public void applyTexts(String ip) {
+        ipAddress = ip;
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString("ip_address", ipAddress);
+        editor.apply();
     }
 }

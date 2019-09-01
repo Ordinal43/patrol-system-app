@@ -57,7 +57,8 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/progressBarLogout"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:indeterminateDrawable="@drawable/progress"/>
     </FrameLayout>
 
 </RelativeLayout>

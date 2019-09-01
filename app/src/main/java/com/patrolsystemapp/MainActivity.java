@@ -117,13 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 JSONObject userObj = new JSONObject(sharedPrefs.getString("user_object", ""));
                 String name = userObj.getString("name");
-                String username = userObj.getString("username");
-
-                // save master key into stored preferences
-                String masterKey = userObj.getString("master_key");
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString("master_key", masterKey);
-                editor.apply();
+                String username = sharedPrefs.getString("login_username", "");
 
                 txtName.setText(name);
                 txtUsername.setText(username);
@@ -172,7 +166,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
                 .build();
 
-        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+//        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("token", sharedPrefs.getString("token", ""))
+                .build();
 
         String url = "http://" + ipAddress;
         Request request = new Request.Builder()
@@ -210,20 +208,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String jsonString = response.body().string();
                 Log.d(TAG, "onResponse: " + jsonString);
                 try {
-                    JSONObject obj = new JSONObject(jsonString);
-                    boolean err = (Boolean) obj.get("error");
-                    if (!err) {
-                        SharedPreferences.Editor ed = sharedPrefs.edit();
-                        ed.remove("user_object");
-                        ed.remove("master_key");
-                        ed.apply();
-                        Intent intent = new Intent(mContext, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    } else {
-                        throw new Exception("Error API!");
-                    }
-
+                    SharedPreferences.Editor ed = sharedPrefs.edit();
+                    ed.remove("token");
+                    ed.remove("master_key");
+                    ed.remove("user_object");
+                    ed.apply();
+                    Intent intent = new Intent(mContext, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
                     runOnUiThread(new Runnable() {

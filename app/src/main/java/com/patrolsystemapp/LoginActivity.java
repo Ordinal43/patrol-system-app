@@ -170,8 +170,8 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                 Log.d(TAG, "onResponse: " + jsonString);
                 try {
                     JSONObject obj = new JSONObject(jsonString);
-                    boolean err = (Boolean) obj.get("error");
-                    if (!err) {
+                    boolean auth = (Boolean) obj.get("authenticate");
+                    if (auth) {
                         if (obj.isNull("user")) {
                             runOnUiThread(new Runnable() {
                                 public void run() {
@@ -180,8 +180,11 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                             });
                         } else {
                             String user = obj.get("user").toString();
+                            JSONObject userObj = new JSONObject(user);
 
                             SharedPreferences.Editor editor = sharedPrefs.edit();
+                            editor.putString("token", obj.get("access_token").toString());
+                            editor.putString("master_key", userObj.getString("master_key"));
                             editor.putString("user_object", user);
                             editor.putString("login_username", username);
                             editor.apply();

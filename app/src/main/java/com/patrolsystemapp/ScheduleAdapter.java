@@ -22,7 +22,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         this.mContext = mContext;
     }
 
-//    coverts layout item_schedule.xml into a java object
+    //    coverts layout item_schedule.xml into a java object
     @NonNull
     @Override
     public ScheduleHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -36,12 +36,12 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         scheduleHolder.setIsRecyclable(false);
         Schedule schedule = scheduleList.get(i);
 
-        if (scheduleList.get(i).getStatus().equals("SUDAH")) {
+        if (scheduleList.get(i).getStatus_node().isEmpty()) {
             scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.sudah));
         }
-        scheduleHolder.txtLocation.setText(schedule.getLocation());
-        scheduleHolder.txtTime.setText(schedule.getTime());
-        scheduleHolder.txtStatus.setText(schedule.getStatus());
+        scheduleHolder.txtLocation.setText(schedule.getRoom());
+        scheduleHolder.txtTime.setText(schedule.getTime_start() + " - " + schedule.getTime_end());
+        scheduleHolder.txtStatus.setText(schedule.getStatus_node());
     }
 
     @Override
@@ -52,9 +52,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     public class ScheduleHolder extends RecyclerView.ViewHolder {
         public TextView txtLocation, txtTime, txtStatus;
 
-        public ScheduleHolder(View itemView){
+        public ScheduleHolder(View itemView) {
             super(itemView);
-            txtLocation = itemView.findViewById(R.id.txtLocation);
+            txtLocation = itemView.findViewById(R.id.txtRoom);
             txtTime = itemView.findViewById(R.id.txtTime);
             txtStatus = itemView.findViewById(R.id.txtStatus);
 

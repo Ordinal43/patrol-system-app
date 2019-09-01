@@ -288,7 +288,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         String url = "http://" + ipAddress;
         Request request = new Request.Builder()
-                .url(url + "/api/guard/users/shifts")
+                .url(url + "/api/guard/users/shifts/?token="
+                        + sharedPrefs.getString("token", ""))
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -305,16 +306,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String jsonString = response.body().string();
-                Log.d(TAG, "Huhu: " + jsonString);
+                Log.d(TAG, "onResponse: " + jsonString);
                 try {
                     JSONObject obj = new JSONObject(jsonString);
                     boolean err = (Boolean) obj.get("error");
                     if (!err) {
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "Nice!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        SharedPreferences.Editor editor = sharedPrefs.edit();
+                        editor.putString("shifts", obj.getString("data"));
+                        editor.apply();
+
+                        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+                        homeFragment.setSchedules(sharedPrefs);
                     } else {
                         throw new Exception("Error API!");
                     }

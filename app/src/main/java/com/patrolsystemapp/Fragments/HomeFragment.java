@@ -1,5 +1,6 @@
 package com.patrolsystemapp.Fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,24 +8,35 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.ScheduleAdapter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG="HomeFragment";
     View rootView;
     private RecyclerView rcySchedule;
     private ScheduleAdapter scheduleAdapter;
     private LinearLayout btnScan;
+    private List<Schedule> scheduleList;
 
     @Nullable
     @Override
@@ -50,20 +62,36 @@ public class HomeFragment extends Fragment {
 
     private void initRecycler() {
         rcySchedule = rootView.findViewById(R.id.rcySchedule);
-        final List<Schedule> scheduleList = new ArrayList();
+        scheduleList = new ArrayList();
         scheduleAdapter = new ScheduleAdapter(scheduleList, getContext());
 
         RecyclerView.LayoutManager lm = new LinearLayoutManager(getContext());
         rcySchedule.setLayoutManager(lm);
         rcySchedule.setItemAnimator(new DefaultItemAnimator());
         rcySchedule.setAdapter(scheduleAdapter);
+    }
 
-        scheduleList.add(new Schedule("18.00", "Gedung Koinonia Lt.1", "BELUM"));
-        scheduleList.add(new Schedule("17.00", "Gedung Didaktos Lt.1", "BELUM"));
-        scheduleList.add(new Schedule("16.00", "Gedung Didaktos Lt.2", "BELUM"));
-        scheduleList.add(new Schedule("15.00", "Gedung Didaktos Lt.3", "BELUM"));
-        scheduleList.add(new Schedule("14.00", "Gedung Agape Lt. B2", "SUDAH"));
-        scheduleList.add(new Schedule("13.00", "Gedung Agape Lt.1", "SUDAH"));
-        scheduleList.add(new Schedule("12.00", "Gedung Agape Lt.2", "SUDAH"));
+    public void setSchedules(SharedPreferences sharedPrefs) {
+        scheduleList.clear();
+
+        String shifts = sharedPrefs.getString("shifts", "");
+        try {
+            JSONArray arr = new JSONArray(shifts);
+            Gson gson = new GsonBuilder().create();
+
+            for(int i = 0; i < arr.length(); i++) {
+                JSONObject row = arr.getJSONObject(i);
+                Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
+                scheduleList.add(schedule);
+            }
+
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    scheduleAdapter.notifyDataSetChanged();
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

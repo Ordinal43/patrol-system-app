@@ -56,10 +56,10 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private void initWidgets() {
         mContext = LoginActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        frameLoading = (FrameLayout) findViewById(R.id.frameLoading);
+        frameLoading = findViewById(R.id.frameLoading);
         frameLoading.setVisibility(View.GONE);
 
-        edtUsername = (EditText) findViewById(R.id.edtUsername);
+        edtUsername = findViewById(R.id.edtUsername);
 
 
         if (sharedPrefs.contains("login_username")) {
@@ -68,10 +68,10 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
             edtUsername.setText(login_username);
         }
 
-        edtPassword = (EditText) findViewById(R.id.edtPassword);
-        btnLogin = (Button) findViewById(R.id.btnLogin);
+        edtPassword = findViewById(R.id.edtPassword);
+        btnLogin = findViewById(R.id.btnLogin);
 
-        txtIp = (TextView) findViewById(R.id.txtIp);
+        txtIp = findViewById(R.id.txtIp);
 
         if (!sharedPrefs.contains("ip_address")) {
             SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         ipAddress = sharedPrefs.getString("ip_address", "");
         txtIp.setText(ipAddress);
 
-        btnIp = (Button) findViewById(R.id.btnIp);
+        btnIp = findViewById(R.id.btnIp);
 
         btnIp.setOnClickListener(v -> {
             openDialog();

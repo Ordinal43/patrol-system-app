@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mContext = MainActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
 
-        frameLoadingLogout = (FrameLayout) findViewById(R.id.frameLoadingLogout);
+        frameLoadingLogout = findViewById(R.id.frameLoadingLogout);
         frameLoadingLogout.setVisibility(View.GONE);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -336,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void fetchSchedule() {
         if (sharedPrefs.contains("user_object")) {
-            if(PatrolApp.isActivityVisible()) {
+            if (PatrolApp.isActivityVisible()) {
                 requestSchedule();
             }
         }

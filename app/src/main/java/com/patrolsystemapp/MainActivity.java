@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -60,9 +59,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String ipAddress;
 
-    // for fetching current schedule
-    private Handler mHandler;
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -106,9 +102,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         ipAddress = sharedPrefs.getString("ip_address", "");
-        mHandler = new Handler();
-        // start scheduler for fetching shifts
-        startRepeatingTask();
 
         if (sharedPrefs.contains("user_object")) {
             try {
@@ -280,88 +273,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void requestSchedule() {
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
-
-        String url = "http://" + ipAddress;
-        Request request = new Request.Builder()
-                .url(url + "/api/guard/users/shifts/?token="
-                        + sharedPrefs.getString("token", ""))
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Terjadi kesalahan!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String jsonString = response.body().string();
-                Log.d(TAG, "onResponse: " + jsonString);
-                try {
-                    JSONObject obj = new JSONObject(jsonString);
-                    boolean err = (Boolean) obj.get("error");
-                    if (!err) {
-                        SharedPreferences.Editor editor = sharedPrefs.edit();
-                        editor.putString("shifts", obj.getString("data"));
-                        editor.apply();
-
-                        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-                        homeFragment.setSchedules(sharedPrefs);
-                    } else {
-                        throw new Exception("Error API!");
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Terjadi kesalahan!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        });
-
-    }
-
-    private void fetchSchedule() {
-        if (sharedPrefs.contains("user_object")) {
-            if (PatrolApp.isActivityVisible()) {
-                requestSchedule();
-            }
-        }
-    }
-
-    Runnable mStatusChecker = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                fetchSchedule(); //this function can change value of mInterval.
-            } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                mHandler.postDelayed(mStatusChecker, 10000);
-            }
-        }
-    };
-
-    void startRepeatingTask() {
-        mStatusChecker.run();
-    }
-
-    void stopRepeatingTask() {
-        mHandler.removeCallbacks(mStatusChecker);
-    }
 
     @Override
     protected void onResume() {
@@ -380,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onDestroy() {
         super.onDestroy();
         mqttHelper.destroy();
-        stopRepeatingTask();
 
     }
 

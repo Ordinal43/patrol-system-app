@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment {
             fetchSchedule();
         });
 
-        linearLayoutError = rootView.findViewById(R.id.layoutError);
+        linearLayoutError = rootView.findViewById(R.id.layoutErrorShifts);
         linearLayoutError.setVisibility(View.GONE);
 
         linearLayoutNoShift = rootView.findViewById(R.id.layoutNoShift);
@@ -181,10 +181,10 @@ public class HomeFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                refreshLayout.setRefreshing(false);
                 mHandler.post(() -> {
                     linearLayoutError.setVisibility(View.VISIBLE);
                 });
+                refreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -211,33 +211,25 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    public void setSchedules(JSONArray listShifts) {
+    public void setSchedules(JSONArray listShifts) throws JSONException {
         scheduleList.clear();
-        try {
-            Gson gson = new GsonBuilder().create();
+        Gson gson = new GsonBuilder().create();
 
-            if (listShifts.length() > 0) {
-                for (int i = 0; i < listShifts.length(); i++) {
-                    JSONObject row = listShifts.getJSONObject(i);
-                    Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
-                    scheduleList.add(schedule);
-                }
-
-                getActivity().runOnUiThread(() -> scheduleAdapter.notifyDataSetChanged());
-                mHandler.post(() -> {
-                    rcyViewSchedule.setVisibility(View.VISIBLE);
-                    fabScan.show();
-                });
-            } else {
-                mHandler.post(() -> {
-                    linearLayoutNoShift.setVisibility(View.VISIBLE);
-                });
+        if (listShifts.length() > 0) {
+            for (int i = 0; i < listShifts.length(); i++) {
+                JSONObject row = listShifts.getJSONObject(i);
+                Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
+                scheduleList.add(schedule);
             }
-        } catch (JSONException e) {
             mHandler.post(() -> {
-                linearLayoutError.setVisibility(View.VISIBLE);
+                scheduleAdapter.notifyDataSetChanged();
+                rcyViewSchedule.setVisibility(View.VISIBLE);
+                fabScan.show();
             });
-            e.printStackTrace();
+        } else {
+            mHandler.post(() -> {
+                linearLayoutNoShift.setVisibility(View.VISIBLE);
+            });
         }
     }
 }

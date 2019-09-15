@@ -1,8 +1,8 @@
 package com.patrolsystemapp.Model;
 
-import android.support.annotation.NonNull;
+import java.io.Serializable;
 
-public class Status {
+public class Status implements Serializable {
     private String id;
     private String name;
 

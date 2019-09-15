@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfirmShiftActivity extends AppCompatActivity implements Serializable {
+public class ConfirmShiftActivity extends AppCompatActivity {
     Schedule matchedSchedule;
 
     // shift card

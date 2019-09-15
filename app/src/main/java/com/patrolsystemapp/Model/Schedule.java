@@ -1,6 +1,8 @@
 package com.patrolsystemapp.Model;
 
-public class Schedule {
+import java.io.Serializable;
+
+public class Schedule implements Serializable {
     public String id;
     public String room;
     public String time_start;

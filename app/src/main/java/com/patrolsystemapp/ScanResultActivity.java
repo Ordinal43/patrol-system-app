@@ -32,7 +32,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ScanResultActivity extends AppCompatActivity implements Serializable {
+public class ScanResultActivity extends AppCompatActivity {
     private static final String TAG = "ScanResultActivity";
     private String ipAddress;
     private SharedPreferences sharedPrefs;

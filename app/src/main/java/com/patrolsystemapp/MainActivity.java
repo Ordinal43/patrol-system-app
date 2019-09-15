@@ -146,12 +146,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void logout() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                frameLoadingLogout.setVisibility(View.VISIBLE);
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            }
+        runOnUiThread(() -> {
+            frameLoadingLogout.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         });
 
         // use connectionSpecs so will work with regular HTTP
@@ -174,28 +172,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        frameLoadingLogout.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+                runOnUiThread(() -> {
+                    frameLoadingLogout.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
                 e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Logout Gagal!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Logout Gagal!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        frameLoadingLogout.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+                runOnUiThread(() -> {
+                    frameLoadingLogout.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
                 String jsonString = response.body().string();
@@ -243,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+            public void messageArrived(String topic, MqttMessage mqttMessage) {
                 Log.w("Debug", mqttMessage.toString());
 //                Toast.makeText(mContext, "Message: " + mqttMessage.toString(), Toast.LENGTH_LONG).show();
             }

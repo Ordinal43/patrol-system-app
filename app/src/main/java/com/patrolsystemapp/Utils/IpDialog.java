@@ -54,7 +54,7 @@ public class IpDialog extends AppCompatDialogFragment {
         super.onAttach(context);
         try {
             listener = (IpDialogListener) context;
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " musr implement IpDialogListener");
         }
 

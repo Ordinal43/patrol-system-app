@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -139,8 +138,6 @@ public class ScanResultActivity extends AppCompatActivity implements Serializabl
         String salt = sharedPrefs.getString("master_key", "0123456789012345");
         int iterations = 100000;
         Crypto crypto = new Crypto();
-
-        Log.d(TAG, "bestoo: " + salt);
 
         boolean confirmed = false;
         Schedule matchedShift = null;

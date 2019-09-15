@@ -5,7 +5,6 @@ import android.util.Base64;
 import org.spongycastle.crypto.digests.SHA256Digest;
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
-import java.util.Arrays;
 
 public class Crypto {
     public String pbkdf2(String secret, String salt, int iterations, int keyLength) {
@@ -13,7 +12,7 @@ public class Crypto {
         byte[] secretData = secret.getBytes();
         byte[] saltData = salt.getBytes();
         gen.init(secretData, saltData, iterations);
-        byte[] derivedKey = ((KeyParameter)gen.generateDerivedParameters(keyLength * 8)).getKey();
+        byte[] derivedKey = ((KeyParameter) gen.generateDerivedParameters(keyLength * 8)).getKey();
         return encode(derivedKey);
     }
 

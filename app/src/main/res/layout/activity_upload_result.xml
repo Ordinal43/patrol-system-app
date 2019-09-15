@@ -16,7 +16,7 @@
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/layoutLoadingScanResult">
+            android:id="@+id/layoutLoadingUpload">
 
             <ImageView
                 android:layout_width="250dp"
@@ -34,49 +34,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sistem sedang mencari jadwal yang sesuai."
+                android:text="Sistem sedang mengunggah hasil verifikasi"
                 android:textAlignment="center" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:orientation="vertical"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/layoutNoMatches">
-
-            <ImageView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:src="@drawable/undraw_no_matches" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Jadwal tidak ditemukan!"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lokasi ini tidak terdapat pada jadwal anda."
-                android:textAlignment="center" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:text="Kembali"
-                android:id="@+id/btnToHome"
-                android:padding="12dp"
-                android:background="@drawable/white_rounded_button" />
         </LinearLayout>
 
         <LinearLayout
@@ -86,7 +46,7 @@
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/layoutErrorScan">
+            android:id="@+id/layoutErrorUpload">
 
             <ImageView
                 android:layout_width="250dp"
@@ -112,9 +72,59 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:text="Muat ulang"
-                android:id="@+id/btnReVerify"
+                android:layout_marginBottom="5dp"
+                android:text="Unggah ulang"
+                android:id="@+id/btnReUpload"
+                android:padding="12dp"
+                android:background="@drawable/white_rounded_button" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Ke beranda"
+                android:id="@+id/btnCancelUpload"
+                android:padding="12dp"
+                android:background="@drawable/white_rounded_button" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:id="@+id/layoutSuccessUpload">
+
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/undraw_confirmed"
+                android:layout_marginBottom="30dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Terkonfirmasi"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Data berhasil diunggah!"
+                android:textAlignment="center" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Ke beranda"
+                android:id="@+id/btnToHome"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
 

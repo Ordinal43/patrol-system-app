@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -32,19 +33,24 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ScanResultActivity extends AppCompatActivity {
+public class ScanResultActivity extends AppCompatActivity implements Serializable {
     private static final String TAG = "ScanResultActivity";
     private String ipAddress;
     private SharedPreferences sharedPrefs;
-    private Context mContext;
     private String scanResult;
 
-    private LinearLayout linearLayoutVerify;
+    private LinearLayout linearLayoutLoadingScan;
     private LinearLayout linearLayoutNoMatches;
-    private LinearLayout linearLayoutErrorVerify;
+    private LinearLayout linearLayoutErrorScan;
 
     private Button btnToHome;
     private Button btnReVerify;
+
+
+    @Override
+    public void onBackPressed() {
+        // prevent back press
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,14 +61,13 @@ public class ScanResultActivity extends AppCompatActivity {
     }
 
     private void initWidgets() {
-        mContext = ScanResultActivity.this;
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
         ipAddress = sharedPrefs.getString("ip_address", "");
         scanResult = getIntent().getStringExtra("SCANRES");
 
-        linearLayoutVerify = findViewById(R.id.layoutVerify);
+        linearLayoutLoadingScan = findViewById(R.id.layoutLoadingScanResult);
         linearLayoutNoMatches = findViewById(R.id.layoutNoMatches);
-        linearLayoutErrorVerify = findViewById(R.id.layoutErrorVerify);
+        linearLayoutErrorScan = findViewById(R.id.layoutErrorScan);
 
         btnReVerify = findViewById(R.id.btnReVerify);
         btnReVerify.setOnClickListener(v -> {
@@ -79,8 +84,8 @@ public class ScanResultActivity extends AppCompatActivity {
 
     private void verifyScanResult() {
         runOnUiThread(() -> {
-            linearLayoutVerify.setVisibility(View.VISIBLE);
-            linearLayoutErrorVerify.setVisibility(View.GONE);
+            linearLayoutLoadingScan.setVisibility(View.VISIBLE);
+            linearLayoutErrorScan.setVisibility(View.GONE);
             linearLayoutNoMatches.setVisibility(View.GONE);
         });
 
@@ -95,16 +100,14 @@ public class ScanResultActivity extends AppCompatActivity {
                         + sharedPrefs.getString("token", ""))
                 .build();
 
-        Log.d(TAG, "requestSchedule: " + url + "/api/guard/users/shifts/?token="
-                + sharedPrefs.getString("token", ""));
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
 
                 runOnUiThread(() -> {
-                    linearLayoutVerify.setVisibility(View.GONE);
-                    linearLayoutErrorVerify.setVisibility(View.VISIBLE);
+                    linearLayoutLoadingScan.setVisibility(View.GONE);
+                    linearLayoutErrorScan.setVisibility(View.VISIBLE);
                 });
             }
 
@@ -124,8 +127,8 @@ public class ScanResultActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                     runOnUiThread(() -> {
-                        linearLayoutVerify.setVisibility(View.GONE);
-                        linearLayoutErrorVerify.setVisibility(View.VISIBLE);
+                        linearLayoutLoadingScan.setVisibility(View.GONE);
+                        linearLayoutErrorScan.setVisibility(View.VISIBLE);
                     });
                 }
             }
@@ -140,7 +143,7 @@ public class ScanResultActivity extends AppCompatActivity {
         Log.d(TAG, "bestoo: " + salt);
 
         boolean confirmed = false;
-        Schedule matchedShift;
+        Schedule matchedShift = null;
 
         Gson gson = new GsonBuilder().create();
 
@@ -167,16 +170,18 @@ public class ScanResultActivity extends AppCompatActivity {
             }
 
             if (confirmed) {
-//                setContentView(R.layout.activity_scan_result_success);
+                Intent intent = new Intent(this, ConfirmShiftActivity.class);
+                intent.putExtra("matchedSchedule", (Serializable) matchedShift);
+                startActivity(intent);
             } else {
                 runOnUiThread(() -> {
-                    linearLayoutVerify.setVisibility(View.GONE);
+                    linearLayoutLoadingScan.setVisibility(View.GONE);
                     linearLayoutNoMatches.setVisibility(View.VISIBLE);
                 });
             }
         } else {
             runOnUiThread(() -> {
-                linearLayoutVerify.setVisibility(View.GONE);
+                linearLayoutLoadingScan.setVisibility(View.GONE);
                 linearLayoutNoMatches.setVisibility(View.VISIBLE);
             });
         }

@@ -44,6 +44,13 @@
         <activity
             android:name=".ScanResultActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ConfirmShiftActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".UploadConfirmationActivity"
+            android:screenOrientation="portrait"></activity>
+
 
         <service android:name="org.eclipse.paho.android.service.MqttService"></service>
 

@@ -159,7 +159,8 @@ public class ScanResultActivity extends AppCompatActivity {
                                 + schedule.getId();
 
                 String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
-                if (scanResult.equals(shiftEncrypted)) {
+
+                if (scanResult.replaceAll("\\P{Print}", "").equals(shiftEncrypted.replaceAll("\\P{Print}", ""))) {
                     confirmed = true;
                     matchedShift = schedule;
                     break;

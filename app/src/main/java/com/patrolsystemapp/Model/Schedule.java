@@ -8,9 +8,9 @@ public class Schedule {
     public String date;
     public String status_node;
     public String message;
-    public String token_shift;
+    public String scan_time;
 
-    public Schedule(String id, String room, String time_start, String time_end, String date, String status_node, String message, String token_shift) {
+    public Schedule(String id, String room, String time_start, String time_end, String date, String status_node, String message, String scan_time) {
         this.id = id;
         this.room = room;
         this.time_start = time_start;
@@ -18,7 +18,7 @@ public class Schedule {
         this.date = date;
         this.status_node = status_node;
         this.message = message;
-        this.token_shift = token_shift;
+        this.scan_time = scan_time;
     }
 
     public String getId() {
@@ -77,11 +77,11 @@ public class Schedule {
         this.message = message;
     }
 
-    public String getToken_shift() {
-        return token_shift;
+    public String getScan_time() {
+        return scan_time;
     }
 
-    public void setToken_shift(String token_shift) {
-        this.token_shift = token_shift;
+    public void setScan_time(String scan_time) {
+        this.scan_time = scan_time;
     }
 }

@@ -12,21 +12,21 @@
         <shape>
             <padding android:top="0dp" android:right="0.5dp" android:bottom="1dp" android:left="0.5dp" />
             <solid android:color="@color/card_shadow_1" />
-            <corners android:radius="2dp" />
+            <corners android:radius="10dp" />
         </shape>
     </item>
     <item>
         <shape>
-            <padding android:top="0dp" android:right="0.5dp" android:bottom="1dp" android:left="0.5dp" />
+            <padding android:top="0dp" android:right="1dp" android:bottom="1.5dp" android:left="0.5dp" />
             <solid android:color="@color/card_shadow_2" />
-            <corners android:radius="2dp" />
+            <corners android:radius="10dp" />
         </shape>
     </item>
     <!-- Background -->
     <item>
         <shape >
             <solid android:color="@color/card_background" />
-            <corners android:radius="2dp" />
+            <corners android:radius="10dp" />
         </shape>
     </item>
 

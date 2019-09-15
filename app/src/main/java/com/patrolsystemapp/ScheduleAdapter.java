@@ -36,12 +36,17 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         scheduleHolder.setIsRecyclable(false);
         Schedule schedule = scheduleList.get(i);
 
-        if (scheduleList.get(i).getStatus_node().isEmpty()) {
-            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.sudah));
-        }
         scheduleHolder.txtLocation.setText(schedule.getRoom());
         scheduleHolder.txtTime.setText(schedule.getTime_start() + " - " + schedule.getTime_end());
-        scheduleHolder.txtStatus.setText(schedule.getStatus_node());
+
+        String status = "Sudah diperiksa";
+
+        if (scheduleList.get(i).getScan_time().isEmpty()) {
+            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.belum));
+            status = "Belum diperiksa";
+        }
+
+        scheduleHolder.txtStatus.setText(status);
     }
 
     @Override
@@ -58,11 +63,8 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             txtTime = itemView.findViewById(R.id.txtTime);
             txtStatus = itemView.findViewById(R.id.txtStatus);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
 
-                }
             });
         }
     }

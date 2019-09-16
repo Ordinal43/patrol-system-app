@@ -54,7 +54,6 @@ public class UploadConfirmationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload_result);
         initWidgets();
         uploadShiftData();
-
     }
 
     private void initWidgets() {
@@ -106,7 +105,7 @@ public class UploadConfirmationActivity extends AppCompatActivity {
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("_method", "patch")
+                .addFormDataPart("_method", "PATCH")
                 .addFormDataPart("token", sharedPrefs.getString("token", ""))
                 .addFormDataPart("id", matchedSchedule.getId())
                 .addFormDataPart("message", message)
@@ -138,8 +137,10 @@ public class UploadConfirmationActivity extends AppCompatActivity {
                     System.out.println(obj.toString(2));
                     boolean err = (Boolean) obj.get("error");
                     if (!err) {
-                        linearLayoutLoadingUpload.setVisibility(View.GONE);
-                        linearLayoutSuccessUpload.setVisibility(View.VISIBLE);
+                        runOnUiThread(() -> {
+                            linearLayoutLoadingUpload.setVisibility(View.GONE);
+                            linearLayoutSuccessUpload.setVisibility(View.VISIBLE);
+                        });
                     } else {
                         throw new Exception("Error API!");
                     }

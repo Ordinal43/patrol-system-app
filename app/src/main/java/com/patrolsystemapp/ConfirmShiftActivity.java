@@ -36,6 +36,7 @@ public class ConfirmShiftActivity extends AppCompatActivity {
     // shift done layouts
     private LinearLayout linearLayoutShiftConfirmed;
     private TextView txtConfirmedOn;
+    private Button btnToHome2;
 
     @Override
     public void onBackPressed() {
@@ -103,9 +104,15 @@ public class ConfirmShiftActivity extends AppCompatActivity {
 
         edtMessage = findViewById(R.id.edtMessage);
         btnConfirmShift = findViewById(R.id.btnConfirmShift);
-
         btnConfirmShift.setOnClickListener(v -> {
             uploadConfirmation();
+        });
+
+        btnToHome2 = findViewById(R.id.btnToHome2);
+        btnToHome2.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
     }

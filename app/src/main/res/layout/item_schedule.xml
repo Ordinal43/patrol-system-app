@@ -40,6 +40,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:text="Belum"
-        android:textColor="@color/belum" />
+        android:textColor="@color/sudah" />
 
 </LinearLayout>

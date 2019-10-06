@@ -46,7 +46,6 @@ import okhttp3.Response;
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
     View rootView;
-    private String ipAddress;
     private SharedPreferences sharedPrefs;
     private RecyclerView rcyViewSchedule;
     private ScheduleAdapter scheduleAdapter;
@@ -68,7 +67,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
         sharedPrefs = this.getActivity().getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        ipAddress = sharedPrefs.getString("ip_address", "");
         initWidgets();
         initRecycler();
         return rootView;
@@ -170,8 +168,9 @@ public class HomeFragment extends Fragment {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
                 .build();
-
+        String ipAddress = sharedPrefs.getString("ip_address", "");
         String url = "http://" + ipAddress;
+
         Request request = new Request.Builder()
                 .url(url + "/api/guard/users/shifts/?token="
                         + sharedPrefs.getString("token", ""))

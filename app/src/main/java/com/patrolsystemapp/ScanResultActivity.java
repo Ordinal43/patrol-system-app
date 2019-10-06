@@ -151,12 +151,8 @@ public class ScanResultActivity extends AppCompatActivity {
 
                 String[] dateArr = schedule.getDate().split("-");
                 Collections.reverse(Arrays.asList(dateArr));
-                String formattedDate = TextUtils.join("", dateArr);
 
-                String secret =
-                        formattedDate + "_"
-                                + schedule.getRoom() + "_"
-                                + schedule.getId();
+                String secret = schedule.getId();
 
                 String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
 

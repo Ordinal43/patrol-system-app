@@ -24,11 +24,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.patrolsystemapp.Fragments.HomeFragment;
 import com.patrolsystemapp.Utils.IpDialog;
-import com.patrolsystemapp.Utils.MqttHelper;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static Context mContext;
     private DrawerLayout drawer;
     //    Custom Mqtt Fragment
-    private MqttHelper mqttHelper;
 
     private FrameLayout frameLoadingLogout;
     private TextView txtName;
@@ -105,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (sharedPrefs.contains("user_object")) {
             try {
-                mqttHelper = new MqttHelper(this);
-                startMqtt();
-
                 JSONObject userObj = new JSONObject(sharedPrefs.getString("user_object", ""));
                 String name = userObj.getString("name");
                 String username = sharedPrefs.getString("login_username", "");
@@ -220,31 +212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void startMqtt() {
-        mqttHelper.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean b, String s) {
-
-            }
-
-            @Override
-            public void connectionLost(Throwable throwable) {
-
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) {
-                Log.w("Debug", mqttMessage.toString());
-//                Toast.makeText(mContext, "Message: " + mqttMessage.toString(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-            }
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -253,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 String topic = "scan";
-                mqttHelper.publish(topic, result.getContents());
                 Intent intent = new Intent(mContext, ScanResultActivity.class);
                 intent.putExtra("SCANRES", result.getContents());
                 startActivity(intent);
@@ -280,8 +246,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mqttHelper.destroy();
-
     }
 
     @Override

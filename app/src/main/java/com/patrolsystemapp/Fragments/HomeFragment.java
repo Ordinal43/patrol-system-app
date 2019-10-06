@@ -163,7 +163,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void requestSchedule() {
-        refreshLayout.setRefreshing(true);
+        mHandler.post(() -> {
+            refreshLayout.setRefreshing(true);
+        });
         // use connectionSpecs so will work with regular HTTP
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
@@ -184,7 +186,9 @@ public class HomeFragment extends Fragment {
                 mHandler.post(() -> {
                     linearLayoutError.setVisibility(View.VISIBLE);
                 });
-                refreshLayout.setRefreshing(false);
+                mHandler.post(() -> {
+                    refreshLayout.setRefreshing(false);
+                });
             }
 
             @Override
@@ -206,7 +210,10 @@ public class HomeFragment extends Fragment {
                         linearLayoutError.setVisibility(View.VISIBLE);
                     });
                 }
-                refreshLayout.setRefreshing(false);
+
+                mHandler.post(() -> {
+                    refreshLayout.setRefreshing(false);
+                });
             }
         });
     }

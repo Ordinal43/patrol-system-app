@@ -164,45 +164,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    frameLoadingLogout.setVisibility(View.GONE);
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                });
-
                 e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Logout Gagal!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> {
-                    frameLoadingLogout.setVisibility(View.GONE);
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                });
-
                 String jsonString = response.body().string();
                 Log.d(TAG, "onResponse: " + jsonString);
-                try {
-                    SharedPreferences.Editor ed = sharedPrefs.edit();
-                    ed.remove("token");
-                    ed.remove("master_key");
-                    ed.remove("user_object");
-                    ed.apply();
-                    Intent intent = new Intent(mContext, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
             }
         });
+
+        toLoginPage();
     }
 
+    private void toLoginPage() {
+        runOnUiThread(() -> {
+            frameLoadingLogout.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        });
+
+        try {
+            SharedPreferences.Editor ed = sharedPrefs.edit();
+            ed.remove("token");
+            ed.remove("master_key");
+            ed.remove("user_object");
+            ed.apply();
+            Intent intent = new Intent(mContext, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() ->
+                    Toast.makeText(getApplicationContext(), "Logout Gagal!", Toast.LENGTH_SHORT).show()
+            );
+        }
+    }
     @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {

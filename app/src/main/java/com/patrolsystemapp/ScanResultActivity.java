@@ -158,7 +158,9 @@ public class ScanResultActivity extends AppCompatActivity {
 
                 String processedScan = scanResult.replaceAll("\\P{Print}", "");
                 String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
-                
+
+                Log.d(TAG, "processedSalt: " + salt);
+                Log.d(TAG, "processedSecret: " + secret);
                 Log.d(TAG, "processedScan : " + processedScan);
                 Log.d(TAG, "processedListItem : " + processedListItem);
 

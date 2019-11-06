@@ -18,6 +18,7 @@ import com.patrolsystemapp.Model.Status;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConfirmShiftActivity extends AppCompatActivity {
     Schedule matchedSchedule;
@@ -51,7 +52,7 @@ public class ConfirmShiftActivity extends AppCompatActivity {
 
         initWidgets();
 
-        if (matchedSchedule.getScan_time().isEmpty()) {
+        if (Objects.toString(matchedSchedule.getScan_time(), "").isEmpty()) {
             linearLayoutConfirmShift.setVisibility(View.VISIBLE);
             txtMatchedMessage.setVisibility(View.GONE);
         } else {

@@ -156,7 +156,13 @@ public class ScanResultActivity extends AppCompatActivity {
 
                 String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
 
-                if (scanResult.replaceAll("\\P{Print}", "").equals(shiftEncrypted.replaceAll("\\P{Print}", ""))) {
+                String processedScan = scanResult.replaceAll("\\P{Print}", "");
+                String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
+                
+                Log.d(TAG, "processedScan : " + processedScan);
+                Log.d(TAG, "processedListItem : " + processedListItem);
+
+                if (processedScan.equals(processedListItem)) {
                     confirmed = true;
                     matchedShift = schedule;
                     break;

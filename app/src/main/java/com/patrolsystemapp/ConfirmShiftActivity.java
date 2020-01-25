@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -28,8 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener {
+    private final int THUMBNAIL_LENGTH = 4;
+
     Schedule matchedSchedule;
 
     // shift card
@@ -49,6 +51,18 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private ImageView imageThumbnail_3;
     private ImageView imageThumbnail_4;
 
+    private int[] arrIdThumbnail = {
+            R.id.imageThumbnail_1,
+            R.id.imageThumbnail_2,
+            R.id.imageThumbnail_3,
+            R.id.imageThumbnail_4
+    };
+
+    private FloatingActionButton btnDeleteImage;
+    private Drawable addImageDrawable;
+
+    private ArrayList<File> listFile = new ArrayList<>();
+    private File currentFile = null;
 
     private Button btnConfirmShift;
 
@@ -141,6 +155,13 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         imageThumbnail_4 = findViewById(R.id.imageThumbnail_4);
         imageThumbnail_4.setOnClickListener(this);
 
+        addImageDrawable = getResources().getDrawable(R.drawable.add_image);
+
+        btnDeleteImage = findViewById(R.id.btnDeleteImage);
+        btnDeleteImage.hide();
+        btnDeleteImage.setOnClickListener(v -> {
+            deleteImage();
+        });
 
         btnConfirmShift = findViewById(R.id.btnConfirmShift);
         btnConfirmShift.setOnClickListener(v -> {
@@ -162,11 +183,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         ImageView thumbnail = (ImageView) v;
 
         if (thumbnail != null && thumbnail.getDrawable() != null) {
-            Drawable.ConstantState constantState = this.getResources()
-                    .getDrawable(R.drawable.add_image)
-                    .getConstantState();
-
-            if (thumbnail.getDrawable().getConstantState() == constantState) {
+            // if ImageView src is still using the add_image drawable, open ImagePicker
+            if (thumbnail.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
                 ImagePicker.Companion.with(this)
                         .cropSquare()
                         .compress(1024)
@@ -174,7 +192,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                         .maxResultSize(620, 620)
                         .start();
             } else {
-                imagePreview.setImageURI((Uri) thumbnail.getTag());
+                currentFile = (File) thumbnail.getTag();
+                imagePreview.setImageURI(Uri.fromFile(currentFile));
             }
         }
     }
@@ -183,33 +202,80 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            //Image Uri will not be null for RESULT_OK
-            Uri fileUri = data != null ? data.getData() : null;
-            imagePreview.setImageURI(fileUri);
+            //You can get File object from intent
+            currentFile = ImagePicker.Companion.getFile(data);
+            Uri currentUri = Uri.fromFile(currentFile);
 
-            int[] arrIdThumbnail = {
-                    R.id.imageThumbnail_1,
-                    R.id.imageThumbnail_2,
-                    R.id.imageThumbnail_3,
-                    R.id.imageThumbnail_4
-            };
+            imagePreview.setImageURI(currentUri);
 
             for (int id : arrIdThumbnail) {
                 ImageView current = findViewById(id);
                 if (current.getTag() == null) {
-                    current.setImageURI(fileUri);
-                    current.setTag(fileUri);
+                    current.setImageURI(currentUri);
+                    current.setTag(currentFile);
                     break;
                 }
             }
-            //You can get File object from intent
-            File file = ImagePicker.Companion.getFile(data);
 
-            //You can also get File Path from intent
             String filePath = ImagePicker.Companion.getFilePath(data);
-            Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+            // DO NOT use currentFile since it will add the reference instead
+            listFile.add(new File(filePath));
+
+            if (!btnDeleteImage.isShown()) {
+                btnDeleteImage.show();
+            }
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.Companion.getError(data), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void deleteImage() {
+        if (currentFile != null) {
+            // loop through the thumbnails and delete matched File
+            int idx = 0;
+            for (int id : arrIdThumbnail) {
+                ImageView iter = findViewById(id);
+                if (currentFile.equals(iter.getTag())) {
+                    // reset the tag
+                    iter.setTag(null);
+                    listFile.get(idx).delete();
+                    listFile.remove(idx);
+                    // rearange thumbnails and tags
+                    for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
+                        ImageView current = findViewById(arrIdThumbnail[i]);
+                        if (i == THUMBNAIL_LENGTH - 1) {
+                            current.setImageDrawable(addImageDrawable);
+                            current.setTag(null);
+                        } else {
+                            ImageView next = findViewById(arrIdThumbnail[i + 1]);
+                            // if ImageView src is still using the add_image drawable, open ImagePicker
+                            if (next.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
+                                current.setImageDrawable(addImageDrawable);
+                                current.setTag(null);
+                                break;
+                            } else {
+                                current.setImageURI(Uri.fromFile((File) next.getTag()));
+                                current.setTag(next.getTag());
+                            }
+                        }
+                    }
+                    break;
+                }
+                idx++;
+            }
+            if (listFile.isEmpty()) {
+                btnDeleteImage.hide();
+                imagePreview.setImageDrawable(getResources().getDrawable(R.drawable.empty_image));
+                currentFile = null;
+            } else {
+                if (idx > listFile.size() - 1) {
+                    idx = listFile.size() - 1;
+                }
+                currentFile = (File) findViewById(arrIdThumbnail[idx]).getTag();
+                imagePreview.setImageURI(
+                        Uri.fromFile((File) findViewById(arrIdThumbnail[idx]).getTag())
+                );
+            }
         }
     }
 

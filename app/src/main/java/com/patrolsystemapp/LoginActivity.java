@@ -111,12 +111,10 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     }
 
     private void login(String username, String password) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                frameLoading.setVisibility(View.VISIBLE);
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            }
+        runOnUiThread(() -> {
+            frameLoading.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         });
 
 
@@ -142,28 +140,20 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        frameLoading.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+                runOnUiThread(() -> {
+                    frameLoading.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
                 e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        frameLoading.setVisibility(View.GONE);
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+                runOnUiThread(() -> {
+                    frameLoading.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
                 String jsonString = response.body().string();
@@ -173,11 +163,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                     boolean auth = (Boolean) obj.get("authenticate");
                     if (auth) {
                         if (obj.isNull("user")) {
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Username/Password salah!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Username/Password salah!", Toast.LENGTH_SHORT).show());
                         } else {
                             String user = obj.get("user").toString();
                             JSONObject userObj = new JSONObject(user);
@@ -199,11 +185,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show());
                 }
             }
         });

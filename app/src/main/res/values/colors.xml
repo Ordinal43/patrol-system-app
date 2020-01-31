@@ -21,4 +21,9 @@
     <!-- for recycler -->
     <color name="belum">#E53935</color>
     <color name="sudah">#43A047</color>
+
+    <!-- for image picker -->
+    <color name="ucrop_color_toolbar">@color/colorPrimary</color>
+    <color name="ucrop_color_statusbar">@color/colorPrimaryDark</color>
+    <color name="ucrop_color_widget_active">@color/colorPrimary</color>
 </resources>

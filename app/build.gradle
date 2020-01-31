@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    buildToolsVersion "29.0.0"
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.patrolsystemapp"
-        minSdkVersion 22
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -31,10 +32,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-//    zxing android embedded
+    // zxing android embedded
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
 
-//    okhttp
+    // okhttp
     implementation "com.squareup.okhttp3:okhttp:3.14.1"
 
     // spongycastle
@@ -49,4 +50,11 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.7.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+
+    // Image picker
+    implementation 'com.github.dhaval2404:imagepicker-support:1.5'
+    implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.1'
+
+    // HTTP logging interceptor
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.3.1'
 }

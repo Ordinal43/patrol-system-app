@@ -164,7 +164,11 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         btnConfirmShift = findViewById(R.id.btnConfirmShift);
         btnConfirmShift.setOnClickListener(v -> {
-            uploadConfirmation();
+            if(listFiles.isEmpty()) {
+                Toast.makeText(this, "Belum ada gambar!", Toast.LENGTH_LONG).show();
+            } else {
+                uploadConfirmation();
+            }
         });
 
         btnToHome2 = findViewById(R.id.btnToHome2);

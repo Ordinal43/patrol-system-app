@@ -13,24 +13,24 @@ import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Utils.Crypto;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class ScanResultActivity extends AppCompatActivity {
     private static final String TAG = "ScanResultActivity";
@@ -88,31 +88,17 @@ public class ScanResultActivity extends AppCompatActivity {
             linearLayoutNoMatches.setVisibility(View.GONE);
         });
 
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
+        String param_token = sharedPrefs.getString("token", "");
 
-        String url = "http://" + ipAddress;
-        Request request = new Request.Builder()
-                .url(url + "/api/guard/users/shifts/?token="
-                        + sharedPrefs.getString("token", ""))
-                .build();
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        client.newCall(request).enqueue(new Callback() {
+        Call<JsonObject> call = uploadApis.getListShifts(param_token);
+
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-
-                runOnUiThread(() -> {
-                    linearLayoutLoadingScan.setVisibility(View.GONE);
-                    linearLayoutErrorScan.setVisibility(View.VISIBLE);
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String jsonString = response.body().string();
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                String jsonString = response.body().toString();
                 try {
                     JSONObject obj = new JSONObject(jsonString);
                     System.out.println(obj.toString(2));
@@ -122,7 +108,6 @@ public class ScanResultActivity extends AppCompatActivity {
                     } else {
                         throw new Exception("Error API!");
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     runOnUiThread(() -> {
@@ -130,6 +115,15 @@ public class ScanResultActivity extends AppCompatActivity {
                         linearLayoutErrorScan.setVisibility(View.VISIBLE);
                     });
                 }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
+                runOnUiThread(() -> {
+                    linearLayoutLoadingScan.setVisibility(View.GONE);
+                    linearLayoutErrorScan.setVisibility(View.VISIBLE);
+                });
             }
         });
     }

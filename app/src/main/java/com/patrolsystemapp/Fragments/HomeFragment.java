@@ -13,7 +13,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,26 +21,27 @@ import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.ScheduleAdapter;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
@@ -164,35 +164,18 @@ public class HomeFragment extends Fragment {
         mHandler.post(() -> {
             refreshLayout.setRefreshing(true);
         });
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
-        String ipAddress = sharedPrefs.getString("ip_address", "");
-        String url = "http://" + ipAddress;
 
-        Request request = new Request.Builder()
-                .url(url + "/api/guard/users/shifts/?token="
-                        + sharedPrefs.getString("token", ""))
-                .build();
+        String param_token = sharedPrefs.getString("token", "");
 
-        Log.d(TAG, "requestSchedule: " + url + "/api/guard/users/shifts/?token="
-                + sharedPrefs.getString("token", ""));
-        client.newCall(request).enqueue(new Callback() {
+        Retrofit retrofit = NetworkClient.getRetrofit(getContext());
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        Call<JsonObject> call = uploadApis.getListShifts(param_token);
+
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                mHandler.post(() -> {
-                    linearLayoutError.setVisibility(View.VISIBLE);
-                });
-                mHandler.post(() -> {
-                    refreshLayout.setRefreshing(false);
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String jsonString = response.body().string();
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                String jsonString = response.body().toString();
                 try {
                     JSONObject obj = new JSONObject(jsonString);
                     System.out.println(obj.toString(2));
@@ -209,8 +192,16 @@ public class HomeFragment extends Fragment {
                         linearLayoutError.setVisibility(View.VISIBLE);
                     });
                 }
-
                 mHandler.post(() -> {
+                    refreshLayout.setRefreshing(false);
+                });
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
+                mHandler.post(() -> {
+                    linearLayoutError.setVisibility(View.VISIBLE);
                     refreshLayout.setRefreshing(false);
                 });
             }

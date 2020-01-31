@@ -10,28 +10,32 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.gson.JsonObject;
 import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class UploadConfirmationActivity extends AppCompatActivity {
     private static final String TAG = "ScanResultActivity";
-    private String ipAddress;
+    private static final String METHOD_PATCH = "patch";
     private SharedPreferences sharedPrefs;
 
     private Schedule matchedSchedule;
+    private ArrayList<File> listFiles;
     private String statusId;
     private String message;
 
@@ -58,9 +62,9 @@ public class UploadConfirmationActivity extends AppCompatActivity {
 
     private void initWidgets() {
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        ipAddress = sharedPrefs.getString("ip_address", "");
 
         matchedSchedule = (Schedule) getIntent().getSerializableExtra("matchedSchedule");
+        listFiles = (ArrayList<File>) getIntent().getSerializableExtra("listFiles");
         statusId = getIntent().getStringExtra("statusId");
         message = getIntent().getStringExtra("message");
 
@@ -98,44 +102,35 @@ public class UploadConfirmationActivity extends AppCompatActivity {
             linearLayoutSuccessUpload.setVisibility(View.GONE);
         });
 
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
+        List<MultipartBody.Part> param_list_images = new ArrayList<>();
+        int idx = 0;
+        for (File file : listFiles) {
+            RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
+            MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "]", file.getName(), requestBody);
+            param_list_images.add(image);
+            idx++;
+        }
 
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("_method", "PATCH")
-                .addFormDataPart("token", sharedPrefs.getString("token", ""))
-                .addFormDataPart("id", matchedSchedule.getId())
-                .addFormDataPart("message", message)
-                .addFormDataPart("status_node_id", statusId)
-                .build();
+        RequestBody param_token = RequestBody.create(sharedPrefs.getString("token", ""), MediaType.parse("multipart/form-data"));
+        RequestBody param_id = RequestBody.create(matchedSchedule.getId(), MediaType.parse("multipart/form-data"));
+        RequestBody param_message = RequestBody.create(message, MediaType.parse("multipart/form-data"));
+        RequestBody method = RequestBody.create(METHOD_PATCH, MediaType.parse("multipart/form-data"));
+        RequestBody param_status_node_id = RequestBody.create(statusId, MediaType.parse("multipart/form-data"));
 
-        String url = "http://" + ipAddress;
-        Request request = new Request.Builder()
-                .url(url + "/api/guard/users/submitShift")
-                .post(requestBody)
-                .build();
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        client.newCall(request).enqueue(new Callback() {
+        Call<JsonObject> call = uploadApis.uploadConfirmation(param_list_images, param_token, param_id, param_message, param_status_node_id, method);
+
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-
-                runOnUiThread(() -> {
-                    linearLayoutLoadingUpload.setVisibility(View.GONE);
-                    linearLayoutErrorUpload.setVisibility(View.VISIBLE);
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String jsonString = response.body().string();
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 try {
+                    String jsonString = response.body().toString();
                     JSONObject obj = new JSONObject(jsonString);
                     System.out.println(obj.toString(2));
                     boolean err = (Boolean) obj.get("error");
+
                     if (!err) {
                         runOnUiThread(() -> {
                             linearLayoutLoadingUpload.setVisibility(View.GONE);
@@ -144,14 +139,18 @@ public class UploadConfirmationActivity extends AppCompatActivity {
                     } else {
                         throw new Exception("Error API!");
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
-                    runOnUiThread(() -> {
-                        linearLayoutLoadingUpload.setVisibility(View.GONE);
-                        linearLayoutErrorUpload.setVisibility(View.VISIBLE);
-                    });
                 }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
+                runOnUiThread(() -> {
+                    linearLayoutLoadingUpload.setVisibility(View.GONE);
+                    linearLayoutErrorUpload.setVisibility(View.VISIBLE);
+                });
             }
         });
     }

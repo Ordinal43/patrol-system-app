@@ -24,7 +24,6 @@ import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Model.Status;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -61,7 +60,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private FloatingActionButton btnDeleteImage;
     private Drawable addImageDrawable;
 
-    private ArrayList<File> listFile = new ArrayList<>();
+    private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
 
     private Button btnConfirmShift;
@@ -187,7 +186,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             if (thumbnail.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
                 ImagePicker.Companion.with(this)
                         .cropSquare()
-                        .compress(1024)
+                        .compress(512)
                         .cameraOnly()
                         .maxResultSize(620, 620)
                         .start();
@@ -219,7 +218,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
             String filePath = ImagePicker.Companion.getFilePath(data);
             // DO NOT use currentFile since it will add the reference instead
-            listFile.add(new File(filePath));
+            listFiles.add(new File(filePath));
 
             if (!btnDeleteImage.isShown()) {
                 btnDeleteImage.show();
@@ -238,8 +237,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 if (currentFile.equals(iter.getTag())) {
                     // reset the tag
                     iter.setTag(null);
-                    listFile.get(idx).delete();
-                    listFile.remove(idx);
+                    listFiles.get(idx).delete();
+                    listFiles.remove(idx);
                     // rearange thumbnails and tags
                     for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
                         ImageView current = findViewById(arrIdThumbnail[i]);
@@ -263,13 +262,13 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 }
                 idx++;
             }
-            if (listFile.isEmpty()) {
+            if (listFiles.isEmpty()) {
                 btnDeleteImage.hide();
                 imagePreview.setImageDrawable(getResources().getDrawable(R.drawable.empty_image));
                 currentFile = null;
             } else {
-                if (idx > listFile.size() - 1) {
-                    idx = listFile.size() - 1;
+                if (idx > listFiles.size() - 1) {
+                    idx = listFiles.size() - 1;
                 }
                 currentFile = (File) findViewById(arrIdThumbnail[idx]).getTag();
                 imagePreview.setImageURI(
@@ -285,7 +284,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         String message = edtMessage.getText().toString();
 
         Intent intent = new Intent(this, UploadConfirmationActivity.class);
-        intent.putExtra("matchedSchedule", (Serializable) matchedSchedule);
+        intent.putExtra("matchedSchedule", matchedSchedule);
+        intent.putExtra("listFiles", listFiles);
         intent.putExtra("statusId", statusId);
         intent.putExtra("message", message);
 

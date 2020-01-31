@@ -26,7 +26,6 @@ public class NetworkClient {
             okHttpClientBuilder.addInterceptor(logging);
         }
 
-
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(apiUrl)

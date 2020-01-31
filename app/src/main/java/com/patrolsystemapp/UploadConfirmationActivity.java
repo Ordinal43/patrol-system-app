@@ -129,15 +129,15 @@ public class UploadConfirmationActivity extends AppCompatActivity {
                     String jsonString = response.body().toString();
                     JSONObject obj = new JSONObject(jsonString);
                     System.out.println(obj.toString(2));
-                    boolean err = (Boolean) obj.get("error");
+                    boolean isErr = (Boolean) obj.get("error");
 
-                    if (!err) {
+                    if (isErr) {
+                        throw new Exception("Error API!");
+                    } else {
                         runOnUiThread(() -> {
                             linearLayoutLoadingUpload.setVisibility(View.GONE);
                             linearLayoutSuccessUpload.setVisibility(View.VISIBLE);
                         });
-                    } else {
-                        throw new Exception("Error API!");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

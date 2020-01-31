@@ -15,21 +15,19 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.patrolsystemapp.Utils.IpDialog;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialogListener {
@@ -117,51 +115,25 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         });
 
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
+        Call<JsonObject> call = uploadApis.login(username, password);
 
-        // make loading dialog
-
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("username", username)
-                .addFormDataPart("password", password)
-                .build();
-
-        String url = "http://" + ipAddress;
-        Request request = new Request.Builder()
-                .url(url + "/api/auth/login")
-                .post(requestBody)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 runOnUiThread(() -> {
                     frameLoading.setVisibility(View.GONE);
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> {
-                    frameLoading.setVisibility(View.GONE);
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                });
-
-                String jsonString = response.body().string();
+                String jsonString = response.body().toString();
                 Log.d(TAG, "onResponse: " + jsonString);
                 try {
                     JSONObject obj = new JSONObject(jsonString);
-                    boolean auth = (Boolean) obj.get("authenticate");
-                    if (auth) {
+                    boolean isAuth = (Boolean) obj.get("authenticate");
+                    if (isAuth) {
                         if (obj.isNull("user")) {
                             runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Username/Password salah!", Toast.LENGTH_SHORT).show());
                         } else {
@@ -182,11 +154,20 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
                     } else {
                         throw new Exception("Error API!");
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show());
                 }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
+                runOnUiThread(() -> {
+                    frameLoading.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    Toast.makeText(getApplicationContext(), "Login Gagal!", Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }

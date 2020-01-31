@@ -20,38 +20,32 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.patrolsystemapp.Fragments.HomeFragment;
 import com.patrolsystemapp.Utils.IpDialog;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.ConnectionSpec;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, IpDialog.IpDialogListener {
     private static final String TAG = "MainActivity";
     private static Context mContext;
     private DrawerLayout drawer;
-    //    Custom Mqtt Fragment
-
     private FrameLayout frameLoadingLogout;
     private TextView txtName;
     private TextView txtUsername;
-    //    Shared preferences
     private SharedPreferences sharedPrefs;
-
     private String ipAddress;
 
     @Override
@@ -144,33 +138,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         });
 
-        // use connectionSpecs so will work with regular HTTP
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
-                .build();
+        String param_token = sharedPrefs.getString("token", "");
 
-//        RequestBody requestBody = RequestBody.create(null, new byte[0]);
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("token", sharedPrefs.getString("token", ""))
-                .build();
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        String url = "http://" + ipAddress;
-        Request request = new Request.Builder()
-                .url(url + "/api/auth/logout")
-                .post(requestBody)
-                .build();
+        retrofit2.Call<JsonObject> call = uploadApis.logout(param_token);
 
-        client.newCall(request).enqueue(new Callback() {
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void onResponse(retrofit2.Call<JsonObject> call, Response<JsonObject> response) {
+                String jsonString = response.body().toString();
+                Log.d(TAG, "onResponse: " + jsonString);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String jsonString = response.body().string();
-                Log.d(TAG, "onResponse: " + jsonString);
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
             }
         });
 
@@ -199,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             );
         }
     }
+
     @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -236,12 +221,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         PatrolApp.activityPaused();
-    }
-
-    //    Don't forget to close the mqtt conection when logging out
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override

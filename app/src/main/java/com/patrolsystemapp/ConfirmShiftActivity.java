@@ -72,7 +72,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onBackPressed() {
-        // do nothing
+        // prevent back press
     }
 
     @Override
@@ -164,7 +164,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         btnConfirmShift = findViewById(R.id.btnConfirmShift);
         btnConfirmShift.setOnClickListener(v -> {
-            if(listFiles.isEmpty()) {
+            if (listFiles.isEmpty()) {
                 Toast.makeText(this, "Belum ada gambar!", Toast.LENGTH_LONG).show();
             } else {
                 uploadConfirmation();

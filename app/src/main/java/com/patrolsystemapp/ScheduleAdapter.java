@@ -23,7 +23,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         this.mContext = mContext;
     }
 
-    //    coverts layout item_schedule.xml into a java object
+    // converts layout item_schedule.xml into a java object
     @NonNull
     @Override
     public ScheduleHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {

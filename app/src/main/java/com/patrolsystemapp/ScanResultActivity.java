@@ -34,7 +34,6 @@ import retrofit2.Retrofit;
 
 public class ScanResultActivity extends AppCompatActivity {
     private static final String TAG = "ScanResultActivity";
-    private String ipAddress;
     private SharedPreferences sharedPrefs;
     private String scanResult;
 
@@ -44,7 +43,6 @@ public class ScanResultActivity extends AppCompatActivity {
 
     private Button btnToHome;
     private Button btnReVerify;
-
 
     @Override
     public void onBackPressed() {
@@ -61,7 +59,6 @@ public class ScanResultActivity extends AppCompatActivity {
 
     private void initWidgets() {
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        ipAddress = sharedPrefs.getString("ip_address", "");
         scanResult = getIntent().getStringExtra("SCANRES");
 
         linearLayoutLoadingScan = findViewById(R.id.layoutLoadingScanResult);

@@ -31,8 +31,6 @@ import com.patrolsystemapp.apis.UploadApis;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

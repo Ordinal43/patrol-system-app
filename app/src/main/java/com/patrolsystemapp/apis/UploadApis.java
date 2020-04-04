@@ -36,5 +36,4 @@ public interface UploadApis {
                                         @Part("message") RequestBody message,
                                         @Part("status_node_id") RequestBody statusNodeId,
                                         @Part("_method") RequestBody method);
-
 }

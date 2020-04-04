@@ -26,7 +26,7 @@ public class NetworkClient {
             okHttpClientBuilder.addInterceptor(logging);
         }
 
-        if (retrofit == null) {
+        if (retrofit == null || !retrofit.baseUrl().equals(apiUrl)) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(apiUrl)
                     .addConverterFactory(GsonConverterFactory.create())

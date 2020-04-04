@@ -68,7 +68,7 @@
             android:id="@+id/btnIp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ubah IP"/>
+            android:text="Ubah Host"/>
 
     </LinearLayout>
 

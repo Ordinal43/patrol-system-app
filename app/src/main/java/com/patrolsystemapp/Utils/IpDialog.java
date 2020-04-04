@@ -27,7 +27,7 @@ public class IpDialog extends AppCompatDialogFragment {
         View view = inflater.inflate(R.layout.dialog_ip, null);
 
         builder.setView(view)
-                .setTitle("Ubah domain/IP")
+                .setTitle("Ubah Host")
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -26,17 +25,11 @@ import com.patrolsystemapp.Model.Status;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener {
     private final int THUMBNAIL_LENGTH = 4;
 
     Schedule matchedSchedule;
-
-    // shift card
-    private TextView txtMatchedRoom;
-    private TextView txtMatchedTime;
-    private TextView txtMatchedMessage;
 
     // shift not done layouts
     private LinearLayout linearLayoutConfirmShift;
@@ -65,11 +58,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     private Button btnConfirmShift;
 
-    // shift done layouts
-    private LinearLayout linearLayoutShiftConfirmed;
-    private TextView txtConfirmedOn;
-    private Button btnToHome2;
-
     @Override
     public void onBackPressed() {
         // prevent back press
@@ -83,44 +71,16 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         initWidgets();
 
-        // check if schedule is already confirmed previously
-        if (Objects.toString(matchedSchedule.getScan_time(), "").isEmpty()) {
-            linearLayoutConfirmShift.setVisibility(View.VISIBLE);
-            linearLayoutTakePhotos.setVisibility(View.VISIBLE);
-            txtMatchedMessage.setVisibility(View.GONE);
-        } else {
-            linearLayoutShiftConfirmed.setVisibility(View.VISIBLE);
-            txtConfirmedOn.setVisibility(View.VISIBLE);
-            txtMatchedTime.setVisibility(View.GONE);
-        }
+        linearLayoutConfirmShift.setVisibility(View.VISIBLE);
+        linearLayoutTakePhotos.setVisibility(View.VISIBLE);
     }
 
     private void initWidgets() {
-
-        txtMatchedRoom = findViewById(R.id.txtMatchedRoom);
-        txtMatchedRoom.setText(matchedSchedule.getRoom());
-
-        txtMatchedTime = findViewById(R.id.txtMatchedTime);
-        String matchedTime = "(" + matchedSchedule.getTime_start() + " - " + matchedSchedule.getTime_end() + ")";
-        txtMatchedTime.setText(matchedTime);
-
-        txtMatchedMessage = findViewById(R.id.txtMatchedMessage);
-        String message = "\"" + matchedSchedule.getMessage() + "\"";
-        txtMatchedMessage.setText(message);
-
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
         linearLayoutConfirmShift.setVisibility(View.GONE);
 
-        linearLayoutShiftConfirmed = findViewById(R.id.layoutShiftConfirmed);
-        linearLayoutShiftConfirmed.setVisibility(View.GONE);
-
         linearLayoutTakePhotos = findViewById(R.id.linearLayoutTakePhotos);
         linearLayoutTakePhotos.setVisibility(View.GONE);
-
-        txtConfirmedOn = findViewById(R.id.txtConfirmedOn);
-        txtConfirmedOn.setVisibility(View.GONE);
-        String confirmMessage = "Dikonfirmasi pukul " + matchedSchedule.getScan_time();
-        txtConfirmedOn.setText(confirmMessage);
 
         spnStatus = findViewById(R.id.spnStatus);
         List<Status> statusList = new ArrayList<>();
@@ -170,14 +130,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 uploadConfirmation();
             }
         });
-
-        btnToHome2 = findViewById(R.id.btnToHome2);
-        btnToHome2.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
-
     }
 
     @Override
@@ -295,6 +247,4 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         startActivity(intent);
     }
-
-
 }

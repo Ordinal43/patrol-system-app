@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.patrolsystemapp.Model.Schedule;
 
 import java.util.List;
-import java.util.Objects;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleHolder> {
     private List<Schedule> scheduleList;
@@ -38,13 +37,16 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         Schedule schedule = scheduleList.get(i);
 
         scheduleHolder.txtLocation.setText(schedule.getRoom());
-        scheduleHolder.txtTime.setText(schedule.getTime_start() + " - " + schedule.getTime_end());
+        String times = schedule.getTime_start() + " - " + schedule.getTime_end();
+        scheduleHolder.txtTime.setText(times);
 
-        String status = "Sudah diperiksa";
-
-        if (Objects.toString(scheduleList.get(i).getScan_time(), "").isEmpty()) {
+        String status = "";
+        int countScanned = Integer.parseInt(scheduleList.get(i).getCountScanned());
+        if (countScanned == 0) {
             scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.belum));
             status = "Belum diperiksa";
+        } else {
+            status = "Diperiksa " + countScanned + " kali";
         }
 
         scheduleHolder.txtStatus.setText(status);

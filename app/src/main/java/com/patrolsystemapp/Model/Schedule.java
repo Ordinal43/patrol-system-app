@@ -8,19 +8,15 @@ public class Schedule implements Serializable {
     public String time_start;
     public String time_end;
     public String date;
-    public String status_node;
-    public String message;
-    public String scan_time;
+    public String countScanned;
 
-    public Schedule(String id, String room, String time_start, String time_end, String date, String status_node, String message, String scan_time) {
+    public Schedule(String id, String room, String time_start, String time_end, String date, String countScanned) {
         this.id = id;
         this.room = room;
         this.time_start = time_start;
         this.time_end = time_end;
         this.date = date;
-        this.status_node = status_node;
-        this.message = message;
-        this.scan_time = scan_time;
+        this.countScanned = countScanned;
     }
 
     public String getId() {
@@ -63,27 +59,11 @@ public class Schedule implements Serializable {
         this.date = date;
     }
 
-    public String getStatus_node() {
-        return status_node;
+    public String getCountScanned() {
+        return countScanned;
     }
 
-    public void setStatus_node(String status_node) {
-        this.status_node = status_node;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getScan_time() {
-        return scan_time;
-    }
-
-    public void setScan_time(String scan_time) {
-        this.scan_time = scan_time;
+    public void setCountScanned(String countScanned) {
+        this.countScanned = countScanned;
     }
 }

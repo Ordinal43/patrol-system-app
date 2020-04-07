@@ -11,10 +11,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Model.Schedule;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,7 +31,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class UploadConfirmationActivity extends AppCompatActivity {
-    private static final String TAG = "ScanResultActivity";
     private static final String METHOD_PATCH = "patch";
     private SharedPreferences sharedPrefs;
 
@@ -42,10 +42,6 @@ public class UploadConfirmationActivity extends AppCompatActivity {
     private LinearLayout linearLayoutLoadingUpload;
     private LinearLayout linearLayoutErrorUpload;
     private LinearLayout linearLayoutSuccessUpload;
-
-    private Button btnReUpload;
-    private Button btnCancelUpload;
-    private Button btnToHome;
 
     @Override
     public void onBackPressed() {
@@ -73,20 +69,14 @@ public class UploadConfirmationActivity extends AppCompatActivity {
         linearLayoutSuccessUpload = findViewById(R.id.layoutSuccessUpload);
 
 
-        btnReUpload = findViewById(R.id.btnReUpload);
-        btnReUpload.setOnClickListener(v -> {
-            uploadShiftData();
-        });
+        Button btnReUpload = findViewById(R.id.btnReUpload);
+        btnReUpload.setOnClickListener(v -> uploadShiftData());
 
-        btnCancelUpload = findViewById(R.id.btnCancelUpload);
-        btnCancelUpload.setOnClickListener(v -> {
-            toHome();
-        });
+        Button btnCancelUpload = findViewById(R.id.btnCancelUpload);
+        btnCancelUpload.setOnClickListener(v -> toHome());
 
-        btnToHome = findViewById(R.id.btnToHome);
-        btnToHome.setOnClickListener(v -> {
-            toHome();
-        });
+        Button btnToHome = findViewById(R.id.btnToHome);
+        btnToHome.setOnClickListener(v -> toHome());
     }
 
     private void toHome() {
@@ -124,8 +114,9 @@ public class UploadConfirmationActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 try {
+                    assert response.body() != null;
                     String jsonString = response.body().toString();
                     JSONObject obj = new JSONObject(jsonString);
                     System.out.println(obj.toString(2));
@@ -145,7 +136,7 @@ public class UploadConfirmationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 t.printStackTrace();
                 runOnUiThread(() -> {
                     linearLayoutLoadingUpload.setVisibility(View.GONE);

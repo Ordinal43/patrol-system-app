@@ -9,12 +9,12 @@
         android:layout_height="match_parent">
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/refreshLayout"
+            android:id="@+id/fragmentHome_refreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/rcySchedule"
+                android:id="@+id/fragmentHome_rcySchedule"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </android.support.v4.widget.SwipeRefreshLayout>
@@ -23,16 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
+            android:paddingHorizontal="25dp"
             android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/layoutErrorShifts">
+            android:id="@+id/fragmentHome_layoutErrorShift">
 
             <ImageView
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:src="@drawable/undraw_error" />
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -55,7 +53,7 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="25dp"
                 android:text="Muat ulang"
-                android:id="@+id/btnRefresh1"
+                android:id="@+id/fragmentHome_btnRefresh1"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
 
@@ -66,16 +64,14 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:orientation="vertical"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
+            android:paddingHorizontal="25dp"
             android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/layoutNoShift">
+            android:id="@+id/fragmentHome_layoutNoShift">
 
             <ImageView
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:src="@drawable/undraw_no_shift" />
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -91,17 +87,15 @@
                 android:text="Tidak ada jadwal untuk saat ini."
                 android:textAlignment="center" />
 
-
             <android.support.v7.widget.AppCompatButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="25dp"
                 android:text="Segarkan"
-                android:id="@+id/btnRefresh2"
+                android:id="@+id/fragmentHome_btnRefresh2"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
-
         </LinearLayout>
 
     </RelativeLayout>
@@ -116,6 +110,6 @@
         android:elevation="6dp"
         android:backgroundTint="@color/colorPrimary"
         app:borderWidth="0dp"
-        android:id="@+id/btnScan" />
+        android:id="@+id/fragmentHome_btnScan" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -43,7 +43,7 @@
             android:name=".LoginActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ScanResultActivity"
+            android:name=".LoadingScanResActivity"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ConfirmShiftActivity"

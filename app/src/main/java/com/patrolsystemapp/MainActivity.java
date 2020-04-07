@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -23,11 +24,11 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Fragments.HomeFragment;
-import com.patrolsystemapp.Utils.IpDialog;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,13 +39,18 @@ import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, IpDialog.IpDialogListener {
     private static final String TAG = "MainActivity";
-    private static Context mContext;
+    private Context mContext;
+
     private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private MenuItem previousMenuItem;
+    private MenuItem currentMenuItem;
+
     private FrameLayout frameLoadingLogout;
-    private TextView txtName;
-    private TextView txtUsername;
     private SharedPreferences sharedPrefs;
     private String ipAddress;
+
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onStart() {
@@ -71,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawerLayout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View navView = navigationView.getHeaderView(0);
-        txtName = navView.findViewById(R.id.txtName);
-        txtUsername = navView.findViewById(R.id.txtUsername);
+        TextView txtName = navView.findViewById(R.id.txtName);
+        TextView txtUsername = navView.findViewById(R.id.txtUsername);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -85,7 +91,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                     new HomeFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_home);
+            navigationView.setCheckedItem(R.id.menu_item_home);
+            previousMenuItem = navigationView.getMenu().findItem(R.id.menu_item_home);
+            currentMenuItem = previousMenuItem;
         }
 
         ipAddress = sharedPrefs.getString("ip_address", "");
@@ -106,15 +114,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        previousMenuItem = currentMenuItem;
+        currentMenuItem = menuItem;
+
+        drawer.closeDrawer(GravityCompat.START);
+
+        if (previousMenuItem.equals(currentMenuItem) &&
+                currentMenuItem.getItemId() != R.id.menu_item_change_ip)
+            return true;
+        return navigateTo(menuItem);
+    }
+
+    public boolean navigateTo(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.nav_home:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                        new HomeFragment()).commit();
+            case R.id.menu_item_home:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.fragmentContainer, new HomeFragment(), "HomeFragment")
+                        .commit();
                 break;
-            case R.id.nav_change_ip:
+            case R.id.menu_item_change_ip:
                 openDialog();
                 break;
-            case R.id.nav_logout:
+            case R.id.menu_item_logout:
                 logout();
                 break;
         }
@@ -145,13 +168,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(retrofit2.Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(@NotNull retrofit2.Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                assert response.body() != null;
                 String jsonString = response.body().toString();
                 Log.d(TAG, "onResponse: " + jsonString);
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 t.printStackTrace();
             }
         });
@@ -187,7 +211,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            int fragmentCount = getSupportFragmentManager().getBackStackEntryCount();
+            if (fragmentCount == 0) {
+                if (doubleBackToExitPressedOnce) {
+                    super.onBackPressed();
+                    return;
+                }
+
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Tekan BACK sekali lagi untuk keluar.", Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+            } else {
+                getSupportFragmentManager().popBackStack();
+            }
         }
     }
 
@@ -198,8 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (result.getContents() == null) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
-                String topic = "scan";
-                Intent intent = new Intent(mContext, ScanResultActivity.class);
+                Intent intent = new Intent(mContext, LoadingScanResActivity.class);
                 intent.putExtra("SCANRES", result.getContents());
                 startActivity(intent);
             }
@@ -207,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
 
     @Override
     protected void onResume() {
@@ -222,10 +257,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void applyTexts(String ip) {
-        ipAddress = ip;
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString("ip_address", ipAddress);
-        editor.apply();
+    public void confirmDialog(String ip) {
+        navigationView.setCheckedItem(previousMenuItem);
+        currentMenuItem = navigationView.getCheckedItem();
+
+        if (!ipAddress.equals(ip)) {
+            ipAddress = ip;
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putString("ip_address", ipAddress);
+            editor.apply();
+            navigateTo(previousMenuItem);
+        }
+    }
+
+    @Override
+    public void closeDialog() {
+        navigationView.setCheckedItem(previousMenuItem);
+        currentMenuItem = navigationView.getCheckedItem();
     }
 }

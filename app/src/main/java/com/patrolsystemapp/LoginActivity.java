@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,10 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Utils.IpDialog;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import retrofit2.Call;
@@ -35,11 +36,11 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     private FrameLayout frameLoading;
     private EditText edtUsername;
     private EditText edtPassword;
-    private Button btnLogin;
 
     private TextView txtIp;
     private String ipAddress;
-    private Button btnIp;
+
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +48,19 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         setContentView(R.layout.activity_login);
 
         initWidgets();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Tekan BACK sekali lagi untuk keluar.", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 
     private void initWidgets() {
@@ -65,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         }
 
         edtPassword = findViewById(R.id.edtPassword);
-        btnLogin = findViewById(R.id.btnLogin);
+        Button btnLogin = findViewById(R.id.btnLogin);
 
         txtIp = findViewById(R.id.txtIp);
 
@@ -78,11 +92,9 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
         ipAddress = sharedPrefs.getString("ip_address", "");
         txtIp.setText(ipAddress);
 
-        btnIp = findViewById(R.id.btnIp);
+        Button btnIp = findViewById(R.id.btnIp);
 
-        btnIp.setOnClickListener(v -> {
-            openDialog();
-        });
+        btnIp.setOnClickListener(v -> openDialog());
 
         edtUsername.requestFocus();
 
@@ -120,12 +132,13 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 runOnUiThread(() -> {
                     frameLoading.setVisibility(View.GONE);
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 });
 
+                assert response.body() != null;
                 String jsonString = response.body().toString();
                 Log.d(TAG, "onResponse: " + jsonString);
                 try {
@@ -159,7 +172,7 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 t.printStackTrace();
                 runOnUiThread(() -> {
                     frameLoading.setVisibility(View.GONE);
@@ -171,11 +184,16 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     }
 
     @Override
-    public void applyTexts(String ip) {
+    public void confirmDialog(String ip) {
         ipAddress = ip;
         txtIp.setText(ipAddress);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString("ip_address", ipAddress);
         editor.apply();
+    }
+
+    @Override
+    public void closeDialog() {
+        // do nothing
     }
 }

@@ -14,8 +14,8 @@ import android.widget.LinearLayout;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Utils.Crypto;
 
@@ -49,7 +49,7 @@ public class LoadingScanResActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_loading_result);
+        setContentView(R.layout.activity_loading_scan_result);
         initWidgets();
         verifyScanResult();
     }

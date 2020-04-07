@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -78,6 +79,23 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private void initWidgets() {
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
         linearLayoutConfirmShift.setVisibility(View.GONE);
+
+        TextView txtMatchedRoom = findViewById(R.id.txtMatchedRoom);
+        TextView txtMatchedTime = findViewById(R.id.txtMatchedTime);
+        TextView txtMatchedCounts = findViewById(R.id.txtMatchedCounts);
+
+        txtMatchedRoom.setText(matchedSchedule.getRoom());
+        String times = matchedSchedule.getTime_start() + " - " + matchedSchedule.getTime_end();
+        txtMatchedTime.setText(times);
+
+        String status;
+        int countScanned = Integer.parseInt(matchedSchedule.getCountScanned());
+        if (countScanned == 0) {
+            status = "Belum diperiksa";
+        } else {
+            status = "Diperiksa " + countScanned + " kali";
+        }
+        txtMatchedCounts.setText(status);
 
         linearLayoutTakePhotos = findViewById(R.id.linearLayoutTakePhotos);
         linearLayoutTakePhotos.setVisibility(View.GONE);
@@ -174,6 +192,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
             String filePath = ImagePicker.Companion.getFilePath(data);
             // DO NOT use currentFile since it will add the reference instead
+            assert filePath != null;
             listFiles.add(new File(filePath));
 
             if (!btnDeleteImage.isShown()) {

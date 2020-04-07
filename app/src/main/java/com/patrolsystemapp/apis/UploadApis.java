@@ -13,6 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface UploadApis {
@@ -27,6 +28,10 @@ public interface UploadApis {
 
     @GET("guard/users/shifts")
     Call<JsonObject> getListShifts(@Query("token") String token);
+
+    @GET("guard/users/viewHistoryScan/{id}")
+    Call<JsonObject> getListHistory(@Path(value = "id") String id,
+                                    @Query("token") String token);
 
     @Multipart
     @POST("guard/users/submitShift")

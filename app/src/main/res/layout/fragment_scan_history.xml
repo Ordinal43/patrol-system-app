@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="100dp"
+            android:paddingHorizontal="25dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:id="@+id/fragmentScanHistory_layoutErrorHistory">
+
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/undraw_error" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ups!"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Terjadi kesalahan pada sistem. Silahkan coba beberapa saat lagi"
+                android:textAlignment="center" />
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="25dp"
+                android:text="Muat ulang"
+                android:id="@+id/fragmentScanHistory_btnRefresh1"
+                android:padding="12dp"
+                android:background="@drawable/white_rounded_button" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="100dp"
+            android:paddingHorizontal="25dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:id="@+id/fragmentScanHistory_layoutNoHistory">
+
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/undraw_no_history" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hmmm..."
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tidak ada sejarah scan untuk jadwal ini."
+                android:textAlignment="center" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="25dp"
+                android:text="Segarkan"
+                android:id="@+id/fragmentScanHistory_btnRefresh2"
+                android:padding="12dp"
+                android:background="@drawable/white_rounded_button" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@color/colorAccent"
+                android:gravity="bottom"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+                <TextView
+                    android:id="@+id/fragmentScanHistory_txtLocationName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="..." />
+
+                <TextView
+                    android:id="@+id/fragmentScanHistory_txtScheduleTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="..." />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Diperiksa " />
+
+                    <TextView
+                        android:id="@+id/fragmentScanHistory_txtTimesScanned"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" kali" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/fragmentScanHistory_refreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/fragmentScanHistory_rcyHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
+    </FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

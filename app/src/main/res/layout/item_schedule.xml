@@ -44,6 +44,7 @@
             android:paddingTop="5dp"
             android:text="..."
             android:textColor="@color/sudah" />
+
     </LinearLayout>
 
     <LinearLayout

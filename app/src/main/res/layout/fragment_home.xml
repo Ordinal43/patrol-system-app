@@ -17,6 +17,7 @@
                 android:id="@+id/fragmentHome_rcySchedule"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <LinearLayout
@@ -96,6 +97,7 @@
                 android:id="@+id/fragmentHome_btnRefresh2"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
+
         </LinearLayout>
 
     </RelativeLayout>

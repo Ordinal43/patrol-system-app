@@ -75,6 +75,7 @@
                 android:id="@+id/btnToHome"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -118,4 +119,5 @@
         </LinearLayout>
 
     </RelativeLayout>
+
 </android.support.design.widget.CoordinatorLayout>

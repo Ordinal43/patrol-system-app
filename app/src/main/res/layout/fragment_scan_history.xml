@@ -85,6 +85,7 @@
                 android:id="@+id/fragmentScanHistory_btnRefresh2"
                 android:padding="12dp"
                 android:background="@drawable/white_rounded_button" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -138,7 +139,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" kali" />
+
                 </LinearLayout>
+
             </LinearLayout>
 
             <android.support.v4.widget.SwipeRefreshLayout
@@ -151,7 +154,11 @@
                     android:id="@+id/fragmentScanHistory_rcyHistory"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
+
             </android.support.v4.widget.SwipeRefreshLayout>
+
         </LinearLayout>
+
     </FrameLayout>
+
 </android.support.design.widget.CoordinatorLayout>

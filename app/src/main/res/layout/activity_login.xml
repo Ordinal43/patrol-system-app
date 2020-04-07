@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,18 +15,20 @@
             android:layout_width="wrap_content"
             android:layout_height="120dp"
             android:src="@drawable/welcome_logo"
-            android:layout_marginBottom="40dp"/>
+            android:layout_marginBottom="40dp" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textNoSuggestions"
                 android:hint="Username"
-                android:id="@+id/edtUsername"/>
+                android:id="@+id/edtUsername" />
+
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -36,12 +36,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="8dp">
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:hint="Password"
-                android:id="@+id/edtPassword"/>
+                android:id="@+id/edtPassword" />
+
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
@@ -52,7 +54,7 @@
             android:text="LOGIN"
             android:id="@+id/btnLogin"
             android:padding="12dp"
-            android:background="@drawable/white_rounded_button"/>
+            android:background="@drawable/white_rounded_button" />
 
         <TextView
             android:id="@+id/txtIp"
@@ -61,13 +63,13 @@
             android:text="0.0.0.0"
             android:textSize="20sp"
             android:layout_marginTop="50dp"
-            android:textAlignment="center"/>
+            android:textAlignment="center" />
 
         <Button
             android:id="@+id/btnIp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ubah Host"/>
+            android:text="Ubah Host" />
 
     </LinearLayout>
 
@@ -75,18 +77,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/frameLoading">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorBlack"
-            android:alpha="0.3">
-        </LinearLayout>
+            android:alpha="0.3" />
+
         <ProgressBar
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/progressBar"
             android:layout_gravity="center"
-            android:indeterminateDrawable="@drawable/progress"/>
+            android:indeterminateDrawable="@drawable/progress" />
     </FrameLayout>
 
 </RelativeLayout>

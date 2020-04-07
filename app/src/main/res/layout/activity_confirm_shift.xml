@@ -192,9 +192,11 @@
                         android:text="Konfirmasi" />
 
                 </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
 
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

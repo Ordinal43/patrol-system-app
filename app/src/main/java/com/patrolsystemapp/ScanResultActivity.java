@@ -14,16 +14,16 @@ import android.widget.LinearLayout;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Model.Schedule;
-import com.patrolsystemapp.Utils.Crypto;
 import com.patrolsystemapp.apis.NetworkClient;
 import com.patrolsystemapp.apis.UploadApis;
+import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Utils.Crypto;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -32,7 +32,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ScanResultActivity extends AppCompatActivity {
+public class LoadingScanResActivity extends AppCompatActivity {
     private static final String TAG = "ScanResultActivity";
     private SharedPreferences sharedPrefs;
     private String scanResult;
@@ -40,9 +40,6 @@ public class ScanResultActivity extends AppCompatActivity {
     private LinearLayout linearLayoutLoadingScan;
     private LinearLayout linearLayoutNoMatches;
     private LinearLayout linearLayoutErrorScan;
-
-    private Button btnToHome;
-    private Button btnReVerify;
 
     @Override
     public void onBackPressed() {
@@ -52,7 +49,7 @@ public class ScanResultActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_result);
+        setContentView(R.layout.activity_loading_result);
         initWidgets();
         verifyScanResult();
     }
@@ -65,12 +62,10 @@ public class ScanResultActivity extends AppCompatActivity {
         linearLayoutNoMatches = findViewById(R.id.layoutNoMatches);
         linearLayoutErrorScan = findViewById(R.id.layoutErrorScan);
 
-        btnReVerify = findViewById(R.id.btnReVerify);
-        btnReVerify.setOnClickListener(v -> {
-            verifyScanResult();
-        });
+        Button btnReVerify = findViewById(R.id.btnReVerify);
+        btnReVerify.setOnClickListener(v -> verifyScanResult());
 
-        btnToHome = findViewById(R.id.btnToHome);
+        Button btnToHome = findViewById(R.id.btnToHome);
         btnToHome.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -90,11 +85,12 @@ public class ScanResultActivity extends AppCompatActivity {
         Retrofit retrofit = NetworkClient.getRetrofit(this);
         UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        Call<JsonObject> call = uploadApis.getListShifts(param_token);
+        Call<JsonObject> call = uploadApis.getListShift(param_token);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                assert response.body() != null;
                 String jsonString = response.body().toString();
                 try {
                     JSONObject obj = new JSONObject(jsonString);
@@ -115,7 +111,7 @@ public class ScanResultActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 t.printStackTrace();
                 runOnUiThread(() -> {
                     linearLayoutLoadingScan.setVisibility(View.GONE);
@@ -164,7 +160,7 @@ public class ScanResultActivity extends AppCompatActivity {
 
             if (confirmed) {
                 Intent intent = new Intent(this, ConfirmShiftActivity.class);
-                intent.putExtra("matchedSchedule", (Serializable) matchedShift);
+                intent.putExtra("matchedSchedule", matchedShift);
                 startActivity(intent);
             } else {
                 runOnUiThread(() -> {

@@ -168,7 +168,7 @@ public class HomeFragment extends Fragment {
         Retrofit retrofit = NetworkClient.getRetrofit(getContext());
         UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        Call<JsonObject> call = uploadApis.getListShifts(param_token);
+        Call<JsonObject> call = uploadApis.getListShift(param_token);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override

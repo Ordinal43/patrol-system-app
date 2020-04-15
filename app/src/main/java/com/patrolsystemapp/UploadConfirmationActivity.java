@@ -104,13 +104,12 @@ public class UploadConfirmationActivity extends AppCompatActivity {
         RequestBody param_token = RequestBody.create(sharedPrefs.getString("token", ""), MediaType.parse("multipart/form-data"));
         RequestBody param_id = RequestBody.create(matchedSchedule.getId(), MediaType.parse("multipart/form-data"));
         RequestBody param_message = RequestBody.create(message, MediaType.parse("multipart/form-data"));
-        RequestBody method = RequestBody.create(METHOD_PATCH, MediaType.parse("multipart/form-data"));
         RequestBody param_status_node_id = RequestBody.create(statusId, MediaType.parse("multipart/form-data"));
 
         Retrofit retrofit = NetworkClient.getRetrofit(this);
         UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        Call<JsonObject> call = uploadApis.uploadConfirmation(param_list_images, param_token, param_id, param_message, param_status_node_id, method);
+        Call<JsonObject> call = uploadApis.uploadConfirmation(param_list_images, param_token, param_id, param_message, param_status_node_id);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
@@ -131,6 +130,10 @@ public class UploadConfirmationActivity extends AppCompatActivity {
                         });
                     }
                 } catch (Exception e) {
+                    runOnUiThread(() -> {
+                        linearLayoutLoadingUpload.setVisibility(View.GONE);
+                        linearLayoutErrorUpload.setVisibility(View.VISIBLE);
+                    });
                     e.printStackTrace();
                 }
             }

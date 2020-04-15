@@ -34,11 +34,10 @@ public interface UploadApis {
                                     @Query("token") String token);
 
     @Multipart
-    @POST("guard/users/submitShift")
-    Call<JsonObject> uploadConfirmation(@Part List<MultipartBody.Part> images,
+    @POST("guard/users/submitScan")
+    Call<JsonObject> uploadConfirmation(@Part List<MultipartBody.Part> photos,
                                         @Part("token") RequestBody token,
                                         @Part("id") RequestBody id,
                                         @Part("message") RequestBody message,
-                                        @Part("status_node_id") RequestBody statusNodeId,
-                                        @Part("_method") RequestBody method);
+                                        @Part("status_node_id") RequestBody statusNodeId);
 }

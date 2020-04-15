@@ -26,6 +26,11 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -121,47 +126,74 @@ public class LoadingScanResActivity extends AppCompatActivity {
         });
     }
 
-    public void confirmShift(JSONArray listShifts) throws JSONException {
+    public void confirmShift(JSONArray listShifts) throws JSONException, InterruptedException {
         String salt = sharedPrefs.getString("master_key", "0123456789012345");
         int iterations = 100000;
         Crypto crypto = new Crypto();
 
         boolean confirmed = false;
-        Schedule matchedShift = null;
+        Schedule matchedSchedule = null;
 
         Gson gson = new GsonBuilder().create();
 
         if (listShifts.length() > 0) {
+            String processedScan = scanResult.replaceAll("\\P{Print}", "");
+
+            ExecutorService executor = Executors.newFixedThreadPool(listShifts.length());
+            CompletionService<String> completionService =
+                    new ExecutorCompletionService<>(executor);
+
             for (int i = 0; i < listShifts.length(); i++) {
-                JSONObject row = listShifts.getJSONObject(i);
+                int currentIdx = i;
+                JSONObject row = listShifts.getJSONObject(currentIdx);
                 Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
 
-                String[] dateArr = schedule.getDate().split("-");
-                Collections.reverse(Arrays.asList(dateArr));
+                completionService.submit(() -> {
+                    String[] dateArr = schedule.getDate().split("-");
+                    Collections.reverse(Arrays.asList(dateArr));
 
-                String secret = schedule.getId();
+                    String secret = schedule.getId();
 
-                String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
+                    String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
+                    String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
 
-                String processedScan = scanResult.replaceAll("\\P{Print}", "");
-                String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
+                    Log.d(TAG, "processedSalt: " + salt);
+                    Log.d(TAG, "processedSecret: " + secret);
+                    Log.d(TAG, "processedScan : " + processedScan);
+                    Log.d(TAG, "processedListItem : " + processedListItem);
+                    return processedListItem;
+                });
+            }
 
-                Log.d(TAG, "processedSalt: " + salt);
-                Log.d(TAG, "processedSecret: " + secret);
-                Log.d(TAG, "processedScan : " + processedScan);
-                Log.d(TAG, "processedListItem : " + processedListItem);
+            int received = 0;
+            while (received < listShifts.length()) {
+                Future<String> resultFuture = completionService.take();
+                try {
+                    String derived = resultFuture.get();
+                    System.out.println("Derived key is : " + derived);
 
-                if (processedScan.equals(processedListItem)) {
-                    confirmed = true;
-                    matchedShift = schedule;
+                    if (processedScan.equals(derived)) {
+                        JSONObject row = listShifts.getJSONObject(received);
+                        Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
+
+                        matchedSchedule = schedule;
+                        confirmed = true;
+
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                     break;
                 }
+                received++;
             }
+            executor.shutdown();
 
             if (confirmed) {
                 Intent intent = new Intent(this, ConfirmShiftActivity.class);
-                intent.putExtra("matchedSchedule", matchedShift);
+                intent.putExtra("matchedSchedule", matchedSchedule);
                 startActivity(intent);
+                finish();
             } else {
                 runOnUiThread(() -> {
                     linearLayoutLoadingScan.setVisibility(View.GONE);

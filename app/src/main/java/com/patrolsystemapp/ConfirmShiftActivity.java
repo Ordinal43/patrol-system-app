@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener {
+public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
     private final int THUMBNAIL_LENGTH = 4;
 
     private float CURRENT_DENSITY;
@@ -63,10 +63,11 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private File currentFile = null;
 
     private Button btnConfirmShift;
+    private Button btnCancelConfirmShift;
 
     @Override
     public void onBackPressed() {
-        // prevent back press
+        openDialog();
     }
 
     @Override
@@ -156,6 +157,11 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             } else {
                 uploadConfirmation();
             }
+        });
+
+        btnCancelConfirmShift = findViewById(R.id.btnCancelConfirmShift);
+        btnCancelConfirmShift.setOnClickListener(v -> {
+            openDialog();
         });
     }
 
@@ -337,5 +343,20 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         startActivity(intent);
         finish();
+    }
+
+    private void openDialog() {
+        CancelConfirmDialog cancelConfirmDialog = new CancelConfirmDialog();
+        cancelConfirmDialog.show(getSupportFragmentManager(), "Cancel Upload Dialog");
+    }
+
+    @Override
+    public void backToHome() {
+        finish();
+    }
+
+    @Override
+    public void closeDialog() {
+
     }
 }

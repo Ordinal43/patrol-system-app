@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.patrolsystemapp.CustomLayout.SquareImageView;
+import com.patrolsystemapp.Model.Scan;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Model.Status;
 
@@ -93,7 +94,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         if (countScanned == 0) {
             status = "Belum diperiksa";
         } else {
-            status = "Diperiksa " + countScanned + " kali";
+            Scan lastScan = matchedSchedule.getLast_scan();
+            status = "Diperiksa " + countScanned + " kali (terakhir: " + lastScan.getScan_time() + ")";
         }
         txtMatchedCounts.setText(status);
 

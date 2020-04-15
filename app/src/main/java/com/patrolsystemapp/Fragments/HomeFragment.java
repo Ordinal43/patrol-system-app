@@ -121,12 +121,16 @@ public class HomeFragment extends Fragment {
         rcyViewSchedule = rootView.findViewById(R.id.fragmentHome_rcySchedule);
         rcyViewSchedule.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 && fabScan.getVisibility() == View.VISIBLE) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 || dy < 0 && fabScan.isShown())
                     fabScan.hide();
-                } else if (dy < 0 && fabScan.getVisibility() != View.VISIBLE) {
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
                     fabScan.show();
-                }
+                super.onScrollStateChanged(recyclerView, newState);
             }
         });
 

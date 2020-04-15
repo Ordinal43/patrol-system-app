@@ -54,6 +54,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
 
         scheduleHolder.txtStatus.setText(status);
 
+        if(currentSchedule.getLast_scan() != null) {
+            String lastScanned = "Terakhir " + currentSchedule.getLast_scan().getScan_time();
+            scheduleHolder.txtLastScanned.setText(lastScanned);
+        } else {
+            scheduleHolder.txtLastScanned.setVisibility(View.GONE);
+        }
+
         scheduleHolder.itemView.setOnClickListener(v -> {
             AppCompatActivity activity = (AppCompatActivity) v.getContext();
             Fragment targetFragment = ScanHistoryFragment.newInstance(currentSchedule);
@@ -71,13 +78,14 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     }
 
     static class ScheduleHolder extends RecyclerView.ViewHolder {
-        private TextView txtLocation, txtTime, txtStatus;
+        private TextView txtLocation, txtTime, txtStatus, txtLastScanned;
 
         private ScheduleHolder(View itemView) {
             super(itemView);
             txtLocation = itemView.findViewById(R.id.txtRoom);
             txtTime = itemView.findViewById(R.id.txtTime);
             txtStatus = itemView.findViewById(R.id.txtStatus);
+            txtLastScanned = itemView.findViewById(R.id.txtLastScanned);
         }
     }
 }

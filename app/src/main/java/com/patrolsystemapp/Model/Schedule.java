@@ -3,20 +3,22 @@ package com.patrolsystemapp.Model;
 import java.io.Serializable;
 
 public class Schedule implements Serializable {
-    public String id;
-    public String room;
-    public String time_start;
-    public String time_end;
-    public String date;
-    public String countScanned;
+    private String id;
+    private String room;
+    private String time_start;
+    private String time_end;
+    private String date;
+    private String countScanned;
+    private Scan last_scan;
 
-    public Schedule(String id, String room, String time_start, String time_end, String date, String countScanned) {
+    public Schedule(String id, String room, String time_start, String time_end, String date, String countScanned, Scan last_scan) {
         this.id = id;
         this.room = room;
         this.time_start = time_start;
         this.time_end = time_end;
         this.date = date;
         this.countScanned = countScanned;
+        this.last_scan = last_scan;
     }
 
     public String getId() {
@@ -65,5 +67,13 @@ public class Schedule implements Serializable {
 
     public void setCountScanned(String countScanned) {
         this.countScanned = countScanned;
+    }
+
+    public Scan getLast_scan() {
+        return last_scan;
+    }
+
+    public void setLast_scan(Scan last_scan) {
+        this.last_scan = last_scan;
     }
 }

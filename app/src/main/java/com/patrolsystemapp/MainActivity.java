@@ -26,6 +26,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
+import com.patrolsystemapp.Dialog.ChangeIpDialog;
 import com.patrolsystemapp.Fragments.HomeFragment;
 
 import org.jetbrains.annotations.NotNull;

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.patrolsystemapp.CustomLayout.SquareImageView;
+import com.patrolsystemapp.Dialog.CancelConfirmDialog;
 import com.patrolsystemapp.Model.Scan;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Model.Status;

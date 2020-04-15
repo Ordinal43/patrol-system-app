@@ -336,5 +336,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         intent.putExtra("message", message);
 
         startActivity(intent);
+        finish();
     }
 }

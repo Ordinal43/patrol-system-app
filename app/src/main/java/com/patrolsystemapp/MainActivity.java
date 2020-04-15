@@ -37,7 +37,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, IpDialog.IpDialogListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ChangeIpDialog.IpDialogListener {
     private static final String TAG = "MainActivity";
     private Context mContext;
 
@@ -145,11 +145,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void openDialog() {
-        IpDialog ipDialog = new IpDialog();
+        ChangeIpDialog changeIpDialog = new ChangeIpDialog();
         Bundle b = new Bundle();
         b.putString("ipAddress", ipAddress);
-        ipDialog.setArguments(b);
-        ipDialog.show(getSupportFragmentManager(), "IP Dialog");
+        changeIpDialog.setArguments(b);
+        changeIpDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void logout() {

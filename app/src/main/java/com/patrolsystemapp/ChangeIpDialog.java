@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import org.jetbrains.annotations.NotNull;
 
-public class IpDialog extends AppCompatDialogFragment {
+public class ChangeIpDialog extends AppCompatDialogFragment {
 
     private EditText edtIp;
     private IpDialogListener listener;
@@ -52,7 +52,7 @@ public class IpDialog extends AppCompatDialogFragment {
         try {
             listener = (IpDialogListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " musr implement IpDialogListener");
+            throw new ClassCastException(context.toString() + " must implement IpDialogListener");
         }
 
     }

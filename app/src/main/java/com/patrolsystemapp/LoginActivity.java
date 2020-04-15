@@ -29,7 +29,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 
-public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialogListener {
+public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.IpDialogListener {
     private static final String TAG = "LoginActivity";
     private SharedPreferences sharedPrefs;
     private Context mContext;
@@ -111,11 +111,11 @@ public class LoginActivity extends AppCompatActivity implements IpDialog.IpDialo
     }
 
     private void openDialog() {
-        IpDialog ipDialog = new IpDialog();
+        ChangeIpDialog changeIpDialog = new ChangeIpDialog();
         Bundle b = new Bundle();
         b.putString("ipAddress", ipAddress);
-        ipDialog.setArguments(b);
-        ipDialog.show(getSupportFragmentManager(), "IP Dialog");
+        changeIpDialog.setArguments(b);
+        changeIpDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void login(String username, String password) {

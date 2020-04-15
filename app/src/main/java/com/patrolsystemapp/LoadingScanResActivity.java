@@ -24,8 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -149,9 +147,6 @@ public class LoadingScanResActivity extends AppCompatActivity {
                 Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
 
                 completionService.submit(() -> {
-                    String[] dateArr = schedule.getDate().split("-");
-                    Collections.reverse(Arrays.asList(dateArr));
-
                     String secret = schedule.getId();
 
                     String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);

@@ -30,7 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class UploadConfirmationActivity extends AppCompatActivity {
+public class LoadingConfirmShiftActivity extends AppCompatActivity {
     private static final String METHOD_PATCH = "patch";
     private SharedPreferences sharedPrefs;
 
@@ -51,7 +51,7 @@ public class UploadConfirmationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload_result);
+        setContentView(R.layout.activity_loading_confirm_shift);
         initWidgets();
         uploadShiftData();
     }

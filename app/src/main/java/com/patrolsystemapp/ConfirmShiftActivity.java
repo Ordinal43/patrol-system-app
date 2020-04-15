@@ -329,7 +329,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
 
-        Intent intent = new Intent(this, UploadConfirmationActivity.class);
+        Intent intent = new Intent(this, LoadingConfirmShiftActivity.class);
         intent.putExtra("matchedSchedule", matchedSchedule);
         intent.putExtra("listFiles", listFiles);
         intent.putExtra("statusId", statusId);

@@ -23,6 +23,7 @@ import com.patrolsystemapp.CustomLayout.SquareImageView;
 import com.patrolsystemapp.Model.Scan;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Model.Status;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ import java.util.List;
 
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener {
     private final int THUMBNAIL_LENGTH = 4;
+
+    private float CURRENT_DENSITY;
 
     Schedule matchedSchedule;
 
@@ -44,7 +47,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private ImageView imageThumbnail_2;
     private ImageView imageThumbnail_3;
     private ImageView imageThumbnail_4;
-
     private int[] arrIdThumbnail = {
             R.id.imageThumbnail_1,
             R.id.imageThumbnail_2,
@@ -54,6 +56,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     private FloatingActionButton btnDeleteImage;
     private Drawable addImageDrawable;
+    private Drawable errorImageDrawable;
+    private Drawable loadingImageDrawable;
 
     private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
@@ -78,6 +82,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initWidgets() {
+        CURRENT_DENSITY = getResources().getDisplayMetrics().density;
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
         linearLayoutConfirmShift.setVisibility(View.GONE);
 
@@ -134,7 +139,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         imageThumbnail_4 = findViewById(R.id.imageThumbnail_4);
         imageThumbnail_4.setOnClickListener(this);
 
-        addImageDrawable = getResources().getDrawable(R.drawable.add_image);
+        addImageDrawable = getDrawable(R.drawable.add_image);
+        errorImageDrawable = getDrawable(R.drawable.broken_image);
+        loadingImageDrawable = getDrawable(R.drawable.loading_image);
 
         btnDeleteImage = findViewById(R.id.btnDeleteImage);
         btnDeleteImage.hide();
@@ -168,7 +175,17 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                         .start();
             } else {
                 currentFile = (File) thumbnail.getTag();
-                imagePreview.setImageURI(Uri.fromFile(currentFile));
+                Uri imageUri = Uri.fromFile(currentFile);
+                int width = (int) (imagePreview.getWidth() * CURRENT_DENSITY);
+                int height = (int) (imagePreview.getHeight() * CURRENT_DENSITY);
+
+                Picasso.get()
+                        .load(imageUri)
+                        .placeholder(loadingImageDrawable)
+                        .error(errorImageDrawable)
+                        .resize(width, height)
+                        .centerCrop()
+                        .into(imagePreview);
             }
         }
     }
@@ -181,13 +198,29 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             currentFile = ImagePicker.Companion.getFile(data);
             Uri currentUri = Uri.fromFile(currentFile);
 
-            imagePreview.setImageURI(currentUri);
+            int width = (int) (imagePreview.getWidth() * CURRENT_DENSITY);
+            int height = (int) (imagePreview.getHeight() * CURRENT_DENSITY);
+            Picasso.get()
+                    .load(currentUri)
+                    .placeholder(loadingImageDrawable)
+                    .error(errorImageDrawable)
+                    .resize(width, height)
+                    .centerCrop()
+                    .into(imagePreview);
 
             for (int id : arrIdThumbnail) {
-                ImageView current = findViewById(id);
-                if (current.getTag() == null) {
-                    current.setImageURI(currentUri);
-                    current.setTag(currentFile);
+                ImageView currentImage = findViewById(id);
+                width = (int) (currentImage.getWidth() * CURRENT_DENSITY);
+                height = (int) (currentImage.getHeight() * CURRENT_DENSITY);
+                if (currentImage.getTag() == null) {
+                    currentImage.setTag(currentFile);
+                    Picasso.get()
+                            .load(currentUri)
+                            .placeholder(loadingImageDrawable)
+                            .error(errorImageDrawable)
+                            .resize(width, height)
+                            .centerCrop()
+                            .into(currentImage);
                     break;
                 }
             }
@@ -219,18 +252,39 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                     // rearange thumbnails and tags
                     for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
                         ImageView current = findViewById(arrIdThumbnail[i]);
+                        int width = (int) (current.getWidth() * CURRENT_DENSITY);
+                        int height = (int) (current.getHeight() * CURRENT_DENSITY);
                         if (i == THUMBNAIL_LENGTH - 1) {
-                            current.setImageDrawable(addImageDrawable);
+                            Picasso.get()
+                                    .load(R.drawable.add_image)
+                                    .placeholder(loadingImageDrawable)
+                                    .error(errorImageDrawable)
+                                    .resize(width, height)
+                                    .centerCrop()
+                                    .into(current);
                             current.setTag(null);
                         } else {
                             ImageView next = findViewById(arrIdThumbnail[i + 1]);
                             // if ImageView src is still using the add_image drawable, open ImagePicker
                             if (next.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
-                                current.setImageDrawable(addImageDrawable);
+                                Picasso.get()
+                                        .load(R.drawable.add_image)
+                                        .placeholder(loadingImageDrawable)
+                                        .error(errorImageDrawable)
+                                        .resize(width, height)
+                                        .centerCrop()
+                                        .into(current);
                                 current.setTag(null);
                                 break;
                             } else {
-                                current.setImageURI(Uri.fromFile((File) next.getTag()));
+                                Uri imageUri = Uri.fromFile((File) next.getTag());
+                                Picasso.get()
+                                        .load(imageUri)
+                                        .placeholder(loadingImageDrawable)
+                                        .error(errorImageDrawable)
+                                        .resize(width, height)
+                                        .centerCrop()
+                                        .into(current);
                                 current.setTag(next.getTag());
                             }
                         }
@@ -239,18 +293,33 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 }
                 idx++;
             }
+
+            int width = (int) (imagePreview.getWidth() * CURRENT_DENSITY);
+            int height = (int) (imagePreview.getHeight() * CURRENT_DENSITY);
+
             if (listFiles.isEmpty()) {
                 btnDeleteImage.hide();
-                imagePreview.setImageDrawable(getResources().getDrawable(R.drawable.empty_image));
+                Picasso.get()
+                        .load(R.drawable.empty_image)
+                        .placeholder(loadingImageDrawable)
+                        .error(errorImageDrawable)
+                        .resize(width, height)
+                        .centerCrop()
+                        .into(imagePreview);
                 currentFile = null;
             } else {
                 if (idx > listFiles.size() - 1) {
                     idx = listFiles.size() - 1;
                 }
                 currentFile = (File) findViewById(arrIdThumbnail[idx]).getTag();
-                imagePreview.setImageURI(
-                        Uri.fromFile((File) findViewById(arrIdThumbnail[idx]).getTag())
-                );
+                Uri imageUri = Uri.fromFile((File) findViewById(arrIdThumbnail[idx]).getTag());
+                Picasso.get()
+                        .load(imageUri)
+                        .placeholder(loadingImageDrawable)
+                        .error(errorImageDrawable)
+                        .resize(width, height)
+                        .centerCrop()
+                        .into(imagePreview);
             }
         }
     }

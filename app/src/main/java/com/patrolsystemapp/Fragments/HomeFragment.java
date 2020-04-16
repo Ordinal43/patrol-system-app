@@ -56,7 +56,6 @@ public class HomeFragment extends Fragment {
     private ArrayList<Schedule> scheduleList;
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

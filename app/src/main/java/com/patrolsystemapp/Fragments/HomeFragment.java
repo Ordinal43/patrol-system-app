@@ -243,36 +243,38 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void run() {
-            ExecutorService executor = Executors.newFixedThreadPool(this.listSchedule.size());
-            CompletionService<String> completionService =
-                    new ExecutorCompletionService<>(executor);
+            if(this.listSchedule.size() > 0) {
+                ExecutorService executor = Executors.newFixedThreadPool(this.listSchedule.size());
+                CompletionService<String> completionService =
+                        new ExecutorCompletionService<>(executor);
 
-            for (int i = 0; i < listSchedule.size(); i++) {
-                Schedule schedule = listSchedule.get(i);
-                completionService.submit(() -> {
-                    String secret = schedule.getId();
+                for (int i = 0; i < listSchedule.size(); i++) {
+                    Schedule schedule = listSchedule.get(i);
+                    completionService.submit(() -> {
+                        String secret = schedule.getId();
 
-                    String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
-                    String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
+                        String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
+                        String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
 
-                    return processedListItem;
-                });
-            }
-
-            int received = 0;
-            while (received < listSchedule.size()) {
-                Future<String> resultFuture = null;
-                try {
-                    resultFuture = completionService.take();
-                    String derived = resultFuture.get();
-                    System.out.println(listSchedule.get(received).getId());
-                    System.out.println(listSchedule.get(received).getRoom());
-                    System.out.println("Key is : " + derived);
-                    System.out.println();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        return processedListItem;
+                    });
                 }
-                received++;
+
+                int received = 0;
+                while (received < listSchedule.size()) {
+                    Future<String> resultFuture = null;
+                    try {
+                        resultFuture = completionService.take();
+                        String derived = resultFuture.get();
+                        System.out.println(listSchedule.get(received).getId());
+                        System.out.println(listSchedule.get(received).getRoom());
+                        System.out.println("Key is : " + derived);
+                        System.out.println();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    received++;
+                }
             }
         }
     }

@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
-    private final int THUMBNAIL_LENGTH = 4;
-
     private float CURRENT_DENSITY;
 
     Schedule matchedSchedule;
@@ -44,10 +42,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private EditText edtMessage;
 
     private SquareImageView imagePreview;
-    private ImageView imageThumbnail_1;
-    private ImageView imageThumbnail_2;
-    private ImageView imageThumbnail_3;
-    private ImageView imageThumbnail_4;
     private int[] arrIdThumbnail = {
             R.id.imageThumbnail_1,
             R.id.imageThumbnail_2,
@@ -56,15 +50,11 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     };
 
     private FloatingActionButton btnDeleteImage;
-    private Drawable addImageDrawable;
     private Drawable errorImageDrawable;
     private Drawable loadingImageDrawable;
 
     private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
-
-    private Button btnConfirmShift;
-    private Button btnCancelConfirmShift;
 
     @Override
     public void onBackPressed() {
@@ -120,7 +110,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         statusList.add(mencurigakan);
         statusList.add(tdkAman);
 
-        ArrayAdapter<Status> adapter = new ArrayAdapter<Status>(
+        ArrayAdapter<Status> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, statusList);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -129,29 +119,26 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         edtMessage = findViewById(R.id.edtMessage);
 
         imagePreview = findViewById(R.id.uploadedImagePreview);
-        imageThumbnail_1 = findViewById(R.id.imageThumbnail_1);
+        ImageView imageThumbnail_1 = findViewById(R.id.imageThumbnail_1);
         imageThumbnail_1.setOnClickListener(this);
 
-        imageThumbnail_2 = findViewById(R.id.imageThumbnail_2);
+        ImageView imageThumbnail_2 = findViewById(R.id.imageThumbnail_2);
         imageThumbnail_2.setOnClickListener(this);
 
-        imageThumbnail_3 = findViewById(R.id.imageThumbnail_3);
+        ImageView imageThumbnail_3 = findViewById(R.id.imageThumbnail_3);
         imageThumbnail_3.setOnClickListener(this);
 
-        imageThumbnail_4 = findViewById(R.id.imageThumbnail_4);
+        ImageView imageThumbnail_4 = findViewById(R.id.imageThumbnail_4);
         imageThumbnail_4.setOnClickListener(this);
 
-        addImageDrawable = getDrawable(R.drawable.add_image);
         errorImageDrawable = getDrawable(R.drawable.broken_image);
         loadingImageDrawable = getDrawable(R.drawable.loading_image);
 
         btnDeleteImage = findViewById(R.id.btnDeleteImage);
         btnDeleteImage.hide();
-        btnDeleteImage.setOnClickListener(v -> {
-            deleteImage();
-        });
+        btnDeleteImage.setOnClickListener(v -> deleteImage());
 
-        btnConfirmShift = findViewById(R.id.btnConfirmShift);
+        Button btnConfirmShift = findViewById(R.id.btnConfirmShift);
         btnConfirmShift.setOnClickListener(v -> {
             if (listFiles.isEmpty()) {
                 Toast.makeText(this, "Belum ada gambar!", Toast.LENGTH_LONG).show();
@@ -160,10 +147,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             }
         });
 
-        btnCancelConfirmShift = findViewById(R.id.btnCancelConfirmShift);
-        btnCancelConfirmShift.setOnClickListener(v -> {
-            openDialog();
-        });
+        Button btnCancelConfirmShift = findViewById(R.id.btnCancelConfirmShift);
+        btnCancelConfirmShift.setOnClickListener(v -> openDialog());
     }
 
     @Override
@@ -261,13 +246,14 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             }
 
             // rearrange thumbnails
-            for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
+            int thumbnailLength = 4;
+            for (int i = idx; i < thumbnailLength; i++) {
                 ImageView current = findViewById(arrIdThumbnail[i]);
                 int width = (int) (current.getWidth() * CURRENT_DENSITY);
                 int height = (int) (current.getHeight() * CURRENT_DENSITY);
 
                 // if its the last thumbnail, replace it add_image drawable
-                if (i == THUMBNAIL_LENGTH - 1) {
+                if (i == thumbnailLength - 1) {
                     Picasso.get()
                             .load(R.drawable.add_image)
                             .placeholder(loadingImageDrawable)

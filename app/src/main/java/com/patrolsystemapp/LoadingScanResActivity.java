@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -130,7 +129,7 @@ public class LoadingScanResActivity extends AppCompatActivity {
         Crypto crypto = new Crypto();
 
         boolean confirmed = false;
-        Schedule matchedSchedule = null;
+        Schedule scanResSchedule = null;
 
         Gson gson = new GsonBuilder().create();
 
@@ -138,40 +137,32 @@ public class LoadingScanResActivity extends AppCompatActivity {
             String processedScan = scanResult.replaceAll("\\P{Print}", "");
 
             ExecutorService executor = Executors.newFixedThreadPool(listShifts.length());
-            CompletionService<String> completionService =
+            CompletionService<ScheduleWithDerived> completionService =
                     new ExecutorCompletionService<>(executor);
 
             for (int i = 0; i < listShifts.length(); i++) {
-                int currentIdx = i;
-                JSONObject row = listShifts.getJSONObject(currentIdx);
+                JSONObject row = listShifts.getJSONObject(i);
                 Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
 
                 completionService.submit(() -> {
                     String secret = schedule.getId();
-
                     String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
-                    String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
-
-                    Log.d(TAG, "processedSalt: " + salt);
-                    Log.d(TAG, "processedSecret: " + secret);
-                    Log.d(TAG, "processedScan : " + processedScan);
-                    Log.d(TAG, "processedListItem : " + processedListItem);
-                    return processedListItem;
+                    return new ScheduleWithDerived(schedule, shiftEncrypted.replaceAll("\\P{Print}", ""));
                 });
             }
 
-            int received = 0;
-            while (received < listShifts.length()) {
-                Future<String> resultFuture = completionService.take();
+            int receivedAmount = 0;
+            while (receivedAmount < listShifts.length()) {
+                Future<ScheduleWithDerived> resultFuture = completionService.take();
                 try {
-                    String derived = resultFuture.get();
-                    System.out.println("Derived key is : " + derived);
+                    ScheduleWithDerived scheduleWithDerived = resultFuture.get();
 
-                    if (processedScan.equals(derived)) {
-                        JSONObject row = listShifts.getJSONObject(received);
-                        Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
+                    Schedule matchedSchedule = scheduleWithDerived.getSchedule();
+                    String derivedKey = scheduleWithDerived.getDerivedKey();
+                    System.out.println("Derived key is : " + scheduleWithDerived.getDerivedKey());
 
-                        matchedSchedule = schedule;
+                    if (processedScan.equals(derivedKey)) {
+                        scanResSchedule = matchedSchedule;
                         confirmed = true;
 
                         break;
@@ -180,13 +171,13 @@ public class LoadingScanResActivity extends AppCompatActivity {
                     e.printStackTrace();
                     break;
                 }
-                received++;
+                receivedAmount++;
             }
             executor.shutdown();
 
             if (confirmed) {
                 Intent intent = new Intent(this, ConfirmShiftActivity.class);
-                intent.putExtra("matchedSchedule", matchedSchedule);
+                intent.putExtra("matchedSchedule", scanResSchedule);
                 startActivity(intent);
                 finish();
             } else {
@@ -200,6 +191,24 @@ public class LoadingScanResActivity extends AppCompatActivity {
                 linearLayoutLoadingScan.setVisibility(View.GONE);
                 linearLayoutNoMatches.setVisibility(View.VISIBLE);
             });
+        }
+    }
+
+    private static class ScheduleWithDerived {
+        private Schedule schedule;
+        private String derivedKey;
+
+        ScheduleWithDerived(Schedule schedule, String derivedKey) {
+            this.schedule = schedule;
+            this.derivedKey = derivedKey;
+        }
+
+        Schedule getSchedule() {
+            return schedule;
+        }
+
+        String getDerivedKey() {
+            return derivedKey;
         }
     }
 

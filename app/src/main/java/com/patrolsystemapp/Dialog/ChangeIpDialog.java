@@ -14,6 +14,8 @@ import com.patrolsystemapp.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URL;
+
 public class ChangeIpDialog extends AppCompatDialogFragment {
 
     private EditText edtIp;
@@ -34,7 +36,11 @@ public class ChangeIpDialog extends AppCompatDialogFragment {
                 .setNegativeButton("cancel", (dialog, which) -> listener.closeDialog())
                 .setPositiveButton("ok", (dialog, which) -> {
                     String ip = edtIp.getText().toString();
-                    listener.confirmDialog(ip);
+                    if(isValidUrl(ip)) {
+                        listener.confirmDialog(ip);
+                    } else {
+                        listener.invalidUrlWarn();
+                    }
                 });
 
         Bundle b = getArguments();
@@ -46,6 +52,16 @@ public class ChangeIpDialog extends AppCompatDialogFragment {
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
+    }
+
+    public static boolean isValidUrl(String url) {
+        String apiUrl = "http://" + url + "/api/";
+        try {
+            new URL(apiUrl).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -61,7 +77,7 @@ public class ChangeIpDialog extends AppCompatDialogFragment {
 
     public interface IpDialogListener {
         void confirmDialog(String ip);
-
+        void invalidUrlWarn();
         void closeDialog();
     }
 }

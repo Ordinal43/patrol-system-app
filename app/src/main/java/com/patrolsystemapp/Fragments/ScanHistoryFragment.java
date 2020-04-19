@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -126,12 +125,6 @@ public class ScanHistoryFragment extends Fragment {
 
         linearLayoutNoHistory = rootView.findViewById(R.id.fragmentScanHistory_layoutNoHistory);
         linearLayoutNoHistory.setVisibility(View.GONE);
-
-        Button btnRefresh1 = rootView.findViewById(R.id.fragmentScanHistory_btnRefresh1);
-        btnRefresh1.setOnClickListener(v -> fetchHistory());
-
-        Button btnRefresh2 = rootView.findViewById(R.id.fragmentScanHistory_btnRefresh2);
-        btnRefresh2.setOnClickListener(v -> fetchHistory());
     }
 
     private void initRecycler() {

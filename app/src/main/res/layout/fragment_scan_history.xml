@@ -27,6 +27,7 @@
                 android:text="Ups!"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp" />
 
             <TextView
@@ -35,16 +36,13 @@
                 android:text="Terjadi kesalahan pada sistem. Silahkan coba beberapa saat lagi"
                 android:textAlignment="center" />
 
-
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:text="Muat ulang"
-                android:id="@+id/fragmentScanHistory_btnRefresh1"
-                android:padding="12dp"
-                android:background="@drawable/white_rounded_button" />
+                android:layout_marginTop="15dp"
+                android:text="(Tarik ke bawah untuk memuat ulang)"
+                android:textColor="@color/colorPrimary"
+                android:textAlignment="center" />
 
         </LinearLayout>
 
@@ -65,26 +63,25 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hmmm..."
+                android:text="Riwayat kosong..."
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tidak ada sejarah scan untuk jadwal ini."
+                android:text="Lokasi/jadwal belum pernah dikonfirmasi."
                 android:textAlignment="center" />
 
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="25dp"
-                android:text="Segarkan"
-                android:id="@+id/fragmentScanHistory_btnRefresh2"
-                android:padding="12dp"
-                android:background="@drawable/white_rounded_button" />
+                android:layout_marginTop="15dp"
+                android:text="(Tarik ke bawah untuk memuat ulang)"
+                android:textColor="@color/colorPrimary"
+                android:textAlignment="center" />
 
         </LinearLayout>
 

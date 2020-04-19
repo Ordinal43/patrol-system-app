@@ -172,8 +172,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         ImageView thumbnail = (ImageView) v;
 
         if (thumbnail != null && thumbnail.getDrawable() != null) {
-            // if ImageView src is still using the add_image drawable, open ImagePicker
-            if (thumbnail.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
+            // if ImageView tag is null, open ImagePicker
+            if (thumbnail.getTag() == null) {
                 ImagePicker.Companion.with(this)
                         .cropSquare()
                         .compress(512)
@@ -247,58 +247,61 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     private void deleteImage() {
         if (currentFile != null) {
-            // loop through the thumbnails and delete matched File
             int idx = 0;
             for (int id : arrIdThumbnail) {
-                ImageView iter = findViewById(id);
-                if (currentFile.equals(iter.getTag())) {
+                ImageView iterator = findViewById(id);
+                if (currentFile.equals(iterator.getTag())) {
                     // reset the tag
-                    iter.setTag(null);
+                    iterator.setTag(null);
                     listFiles.get(idx).delete();
                     listFiles.remove(idx);
-                    // rearange thumbnails and tags
-                    for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
-                        ImageView current = findViewById(arrIdThumbnail[i]);
-                        int width = (int) (current.getWidth() * CURRENT_DENSITY);
-                        int height = (int) (current.getHeight() * CURRENT_DENSITY);
-                        if (i == THUMBNAIL_LENGTH - 1) {
-                            Picasso.get()
-                                    .load(R.drawable.add_image)
-                                    .placeholder(loadingImageDrawable)
-                                    .error(errorImageDrawable)
-                                    .resize(width, height)
-                                    .centerCrop()
-                                    .into(current);
-                            current.setTag(null);
-                        } else {
-                            ImageView next = findViewById(arrIdThumbnail[i + 1]);
-                            // if ImageView src is still using the add_image drawable, open ImagePicker
-                            if (next.getDrawable().getConstantState() == addImageDrawable.getConstantState()) {
-                                Picasso.get()
-                                        .load(R.drawable.add_image)
-                                        .placeholder(loadingImageDrawable)
-                                        .error(errorImageDrawable)
-                                        .resize(width, height)
-                                        .centerCrop()
-                                        .into(current);
-                                current.setTag(null);
-                                break;
-                            } else {
-                                Uri imageUri = Uri.fromFile((File) next.getTag());
-                                Picasso.get()
-                                        .load(imageUri)
-                                        .placeholder(loadingImageDrawable)
-                                        .error(errorImageDrawable)
-                                        .resize(width, height)
-                                        .centerCrop()
-                                        .into(current);
-                                current.setTag(next.getTag());
-                            }
-                        }
-                    }
                     break;
                 }
                 idx++;
+            }
+
+            // rearrange thumbnails
+            for (int i = idx; i < THUMBNAIL_LENGTH; i++) {
+                ImageView current = findViewById(arrIdThumbnail[i]);
+                int width = (int) (current.getWidth() * CURRENT_DENSITY);
+                int height = (int) (current.getHeight() * CURRENT_DENSITY);
+
+                // if its the last thumbnail, replace it add_image drawable
+                if (i == THUMBNAIL_LENGTH - 1) {
+                    Picasso.get()
+                            .load(R.drawable.add_image)
+                            .placeholder(loadingImageDrawable)
+                            .error(errorImageDrawable)
+                            .resize(width, height)
+                            .centerCrop()
+                            .into(current);
+                    current.setTag(null);
+                } else {
+                    ImageView next = findViewById(arrIdThumbnail[i + 1]);
+
+                    // if the next thumbnails image is empty
+                    if (next.getTag() == null) {
+                        Picasso.get()
+                                .load(R.drawable.add_image)
+                                .placeholder(loadingImageDrawable)
+                                .error(errorImageDrawable)
+                                .resize(width, height)
+                                .centerCrop()
+                                .into(current);
+                        current.setTag(null);
+                        break;
+                    } else {
+                        Uri imageUri = Uri.fromFile((File) next.getTag());
+                        Picasso.get()
+                                .load(imageUri)
+                                .placeholder(loadingImageDrawable)
+                                .error(errorImageDrawable)
+                                .resize(width, height)
+                                .centerCrop()
+                                .into(current);
+                        current.setTag(next.getTag());
+                    }
+                }
             }
 
             int width = (int) (imagePreview.getWidth() * CURRENT_DENSITY);

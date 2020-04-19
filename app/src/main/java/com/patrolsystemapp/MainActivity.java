@@ -272,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void invalidUrlWarn() {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "URL Invalid!", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
     public void closeDialog() {
         navigationView.setCheckedItem(previousMenuItem);
         currentMenuItem = navigationView.getCheckedItem();

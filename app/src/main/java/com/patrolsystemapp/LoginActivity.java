@@ -194,6 +194,11 @@ public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.I
     }
 
     @Override
+    public void invalidUrlWarn() {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "URL Invalid!", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
     public void closeDialog() {
         // do nothing
     }

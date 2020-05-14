@@ -67,8 +67,16 @@ public class LoadingScanResActivity extends AppCompatActivity {
         Button btnReVerify = findViewById(R.id.btnReVerify);
         btnReVerify.setOnClickListener(v -> verifyScanResult());
 
-        Button btnToHome = findViewById(R.id.btnToHome);
-        btnToHome.setOnClickListener(v -> {
+        Button btnToHomeScanRes1 = findViewById(R.id.btnToHomeScanRes);
+        Button btnToHomeScanRes2 = findViewById(R.id.btnToHomeScanRes2);
+
+        btnToHomeScanRes1.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
+
+        btnToHomeScanRes2.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -160,10 +160,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
             // if ImageView tag is null, open ImagePicker
             if (thumbnail.getTag() == null) {
                 ImagePicker.Companion.with(this)
-                        .cropSquare()
                         .compress(512)
-                        .cameraOnly()
-                        .maxResultSize(620, 620)
+                        .maxResultSize(1920, 1920)
+//                        .maxResultSize(620, 620)
                         .start();
             } else {
                 currentFile = (File) thumbnail.getTag();

@@ -14,12 +14,14 @@ import android.widget.TextView;
 import com.patrolsystemapp.Fragments.ScanHistoryFragment;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.R;
+import com.patrolsystemapp.Utils.CustomDateUtils;
 
 import java.util.ArrayList;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleHolder> {
     private ArrayList<Schedule> scheduleList;
     private Context mContext;
+    private CustomDateUtils customDateUtils = new CustomDateUtils();
 
     public ScheduleAdapter(ArrayList<Schedule> scheduleList, Context mContext) {
         this.scheduleList = scheduleList;
@@ -42,6 +44,11 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         scheduleHolder.txtLocation.setText(currentSchedule.getRoom());
         String times = currentSchedule.getTime_start() + " - " + currentSchedule.getTime_end();
         scheduleHolder.txtTime.setText(times);
+
+        if(!customDateUtils.isNowInInterval(currentSchedule.getTime_start(), currentSchedule.getTime_end())) {
+            scheduleHolder.txtLocation.setTextColor(ContextCompat.getColor(mContext, R.color.colorGrey));
+            scheduleHolder.txtTime.setTextColor(ContextCompat.getColor(mContext, R.color.colorGrey));
+        }
 
         String status;
         int countScanned = Integer.parseInt(scheduleList.get(i).getCountScanned());

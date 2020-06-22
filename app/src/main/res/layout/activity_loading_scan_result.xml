@@ -55,15 +55,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Jadwal tidak ditemukan!"
+                android:text="TIdak ada jadwal aktif yang cocok!"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:textAlignment="center"
                 android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lokasi ini tidak terdapat pada jadwal anda."
+                android:text="Pastikan lokasi terdapat pada jadwal anda dan waktu shift sudah sesuai."
                 android:textAlignment="center" />
 
             <androidx.appcompat.widget.AppCompatButton

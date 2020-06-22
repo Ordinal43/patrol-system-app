@@ -3,7 +3,7 @@ package com.patrolsystemapp.Utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class DateUtil {
+public class CustomDateUtils {
 
     // format 24hre ex. 12:12 , 17:15
     private static String HOUR_FORMAT = "HH:mm";
@@ -36,6 +36,6 @@ public class DateUtil {
      */
     public boolean isNowInInterval(String start, String end) {
         return isHourInInterval
-                (DateUtil.getCurrentHour(), start, end);
+                (CustomDateUtils.getCurrentHour(), start, end);
     }
 }

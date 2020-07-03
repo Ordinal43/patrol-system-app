@@ -1,13 +1,12 @@
 package com.patrolsystemapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,7 +17,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.JsonObject;
+import com.patrolsystemapp.Apis.ConfirmShiftCall;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.CustomLayout.SquareImageView;
 import com.patrolsystemapp.Dialog.CancelConfirmDialog;
 import com.patrolsystemapp.Model.Scan;
@@ -30,10 +37,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
     private float CURRENT_DENSITY;
-
     Schedule matchedSchedule;
+
+    private SharedPreferences sharedPrefs;
 
     // shift not done layouts
     private LinearLayout linearLayoutConfirmShift;
@@ -74,6 +88,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initWidgets() {
+        sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
+
         CURRENT_DENSITY = getResources().getDisplayMetrics().density;
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
         linearLayoutConfirmShift.setVisibility(View.GONE);
@@ -324,12 +340,34 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
 
-        Intent intent = new Intent(this, LoadingConfirmShiftActivity.class);
-        intent.putExtra("matchedSchedule", matchedSchedule);
-        intent.putExtra("listFiles", listFiles);
-        intent.putExtra("statusId", statusId);
-        intent.putExtra("message", message);
+        List<MultipartBody.Part> param_list_images = new ArrayList<>();
+        int idx = 0;
+        for (File file : listFiles) {
+            RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
+            MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "]", file.getName(), requestBody);
+            param_list_images.add(image);
+            idx++;
+        }
 
+        RequestBody param_token = RequestBody.create(sharedPrefs.getString("token", ""), MediaType.parse("multipart/form-data"));
+        RequestBody param_id = RequestBody.create(matchedSchedule.getId(), MediaType.parse("multipart/form-data"));
+        RequestBody param_message = RequestBody.create(message, MediaType.parse("multipart/form-data"));
+        RequestBody param_status_node_id = RequestBody.create(statusId, MediaType.parse("multipart/form-data"));
+
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        Call<JsonObject> call = uploadApis.uploadConfirmation(
+                param_list_images,
+                param_token,
+                param_id,
+                param_message,
+                param_status_node_id
+        );
+
+        ConfirmShiftCall confirmShiftCall = new ConfirmShiftCall(matchedSchedule, call);
+
+        Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);
         finish();
     }

@@ -5,15 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +29,7 @@ import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.R;
+import com.patrolsystemapp.Utils.Crypto;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -36,6 +37,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -218,6 +224,58 @@ public class HomeFragment extends Fragment {
             });
         } else {
             mHandler.post(() -> linearLayoutNoShift.setVisibility(View.VISIBLE));
+        }
+
+        PrintSchedule printSchedule = new PrintSchedule(scheduleList);
+        Thread t = new Thread(printSchedule);
+        t.start();
+    }
+
+    private class PrintSchedule implements Runnable {
+        String salt = sharedPrefs.getString("master_key", "0123456789012345");
+        int iterations = 100000;
+        Crypto crypto = new Crypto();
+        private ArrayList<Schedule> listSchedule;
+
+        public PrintSchedule(ArrayList<Schedule> listSchedule) {
+            this.listSchedule = listSchedule;
+        }
+
+        @Override
+        public void run() {
+            if(this.listSchedule.size() > 0) {
+                ExecutorService executor = Executors.newFixedThreadPool(this.listSchedule.size());
+                CompletionService<String> completionService =
+                        new ExecutorCompletionService<>(executor);
+
+                for (int i = 0; i < listSchedule.size(); i++) {
+                    Schedule schedule = listSchedule.get(i);
+                    completionService.submit(() -> {
+                        String secret = schedule.getId();
+
+                        String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
+                        String processedListItem = shiftEncrypted.replaceAll("\\P{Print}", "");
+
+                        return processedListItem;
+                    });
+                }
+
+                int received = 0;
+                while (received < listSchedule.size()) {
+                    Future<String> resultFuture = null;
+                    try {
+                        resultFuture = completionService.take();
+                        String derived = resultFuture.get();
+                        System.out.println(listSchedule.get(received).getId());
+                        System.out.println(listSchedule.get(received).getRoom());
+                        System.out.println("Key is : " + derived);
+                        System.out.println();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    received++;
+                }
+            }
         }
     }
 }

@@ -7,12 +7,17 @@ import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
 
 public class Crypto {
-    public String pbkdf2(String secret, String salt, int iterations, int keyLength) {
-        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
-        byte[] secretData = secret.getBytes();
+    public String pbkdf2(String shiftId, String salt, int iterations, int keyLength) {
+        PKCS5S2ParametersGenerator generator =
+                new PKCS5S2ParametersGenerator(new SHA256Digest());
+
+        byte[] secretData = shiftId.getBytes();
         byte[] saltData = salt.getBytes();
-        gen.init(secretData, saltData, iterations);
-        byte[] derivedKey = ((KeyParameter) gen.generateDerivedParameters(keyLength * 8)).getKey();
+
+        generator.init(secretData, saltData, iterations);
+        byte[] derivedKey = ((KeyParameter) generator
+                .generateDerivedParameters(keyLength * 8)).getKey();
+
         return encode(derivedKey);
     }
 

@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,6 +18,7 @@ import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Model.Schedule;
 import com.patrolsystemapp.Utils.Crypto;
+import com.patrolsystemapp.Utils.CustomDateUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -132,17 +134,12 @@ public class LoadingScanResActivity extends AppCompatActivity {
     }
 
     public void confirmShift(JSONArray listShifts) throws JSONException, InterruptedException {
-        String salt = sharedPrefs.getString("master_key", "0123456789012345");
-        int iterations = 100000;
-        Crypto crypto = new Crypto();
-
-        boolean confirmed = false;
-        Schedule scanResSchedule = null;
-
-        Gson gson = new GsonBuilder().create();
-
         if (listShifts.length() > 0) {
-            String processedScan = scanResult.replaceAll("\\P{Print}", "");
+
+            Gson gson = new GsonBuilder().create();
+            Crypto crypto = new Crypto();
+            String salt = sharedPrefs.getString("master_key", "0123456789012345");
+            int iterations = 100000;
 
             ExecutorService executor = Executors.newFixedThreadPool(listShifts.length());
             CompletionService<ScheduleWithDerived> completionService =
@@ -153,26 +150,34 @@ public class LoadingScanResActivity extends AppCompatActivity {
                 Schedule schedule = gson.fromJson(row.toString(), Schedule.class);
 
                 completionService.submit(() -> {
-                    String secret = schedule.getId();
-                    String shiftEncrypted = crypto.pbkdf2(secret, salt, iterations, 32);
-                    return new ScheduleWithDerived(schedule, shiftEncrypted.replaceAll("\\P{Print}", ""));
+                    String shiftId = schedule.getId();
+                    String shiftEncrypted = crypto.pbkdf2(shiftId, salt, iterations, 32);
+                    return new ScheduleWithDerived(
+                            schedule,
+                            shiftEncrypted.replaceAll("\\P{Print}", "")
+                    );
                 });
             }
 
+
+            Schedule scanResSchedule = null;
+            String cleanedString = scanResult.replaceAll("\\P{Print}", "");
+            boolean confirmed = false;
             int receivedAmount = 0;
+            CustomDateUtils customDateUtils = new CustomDateUtils();
+
             while (receivedAmount < listShifts.length()) {
                 Future<ScheduleWithDerived> resultFuture = completionService.take();
                 try {
                     ScheduleWithDerived scheduleWithDerived = resultFuture.get();
-
                     Schedule matchedSchedule = scheduleWithDerived.getSchedule();
                     String derivedKey = scheduleWithDerived.getDerivedKey();
-                    System.out.println("Derived key is : " + scheduleWithDerived.getDerivedKey());
+                    System.out.println("Derived key: " + scheduleWithDerived.getDerivedKey());
 
-                    if (processedScan.equals(derivedKey)) {
+                    boolean isInInterval = customDateUtils.isNowInInterval(matchedSchedule.getTime_start(), matchedSchedule.getTime_end());
+                    if (cleanedString.equals(derivedKey) && isInInterval) {
                         scanResSchedule = matchedSchedule;
                         confirmed = true;
-
                         break;
                     }
                 } catch (Exception e) {

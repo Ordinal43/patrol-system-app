@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class LoadingConfirmShiftActivity extends AppCompatActivity {
+public class FinishConfirmActivity extends AppCompatActivity {
     private static final String METHOD_PATCH = "patch";
 
     @Override

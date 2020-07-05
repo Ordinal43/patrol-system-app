@@ -368,7 +368,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         ConfirmShiftRequest confirmShiftRequest = new ConfirmShiftRequest(matchedSchedule, call);
         ConfirmShiftSingleton.getConfirmShiftRequests().add(confirmShiftRequest);
 
-        Intent intent = new Intent(this, LoadingConfirmShiftActivity.class);
+        Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);
         finish();
     }

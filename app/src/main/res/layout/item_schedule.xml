@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:text="..."
-            android:textColor="@color/sudah" />
+            android:textColor="@color/success" />
 
         <TextView
             android:id="@+id/txtLastScanned"

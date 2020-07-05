@@ -53,7 +53,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         String status;
         int countScanned = Integer.parseInt(scheduleList.get(i).getCountScanned());
         if (countScanned == 0) {
-            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.belum));
+            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.failed));
             status = "Belum diperiksa";
         } else {
             status = "Diperiksa " + countScanned + " kali";

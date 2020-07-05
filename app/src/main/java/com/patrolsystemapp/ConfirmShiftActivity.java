@@ -23,7 +23,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Apis.ConfirmShiftCall;
+import com.patrolsystemapp.Apis.ConfirmShift.ConfirmShiftSingleton;
+import com.patrolsystemapp.Apis.ConfirmShiftRequest;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.CustomLayout.SquareImageView;
@@ -364,7 +365,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 param_status_node_id
         );
 
-        ConfirmShiftCall confirmShiftCall = new ConfirmShiftCall(matchedSchedule, call);
+        ConfirmShiftRequest confirmShiftRequest = new ConfirmShiftRequest(matchedSchedule, call);
+        ConfirmShiftSingleton.getConfirmShiftRequests().add(confirmShiftRequest);
 
         Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);

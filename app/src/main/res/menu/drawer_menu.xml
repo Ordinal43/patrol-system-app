@@ -9,9 +9,15 @@
             android:title="Home"></item>
 
         <item
+            android:id="@+id/menu_item_request_list"
+            android:icon="@drawable/ic_pending_requests"
+            android:title="Request berjalan"></item>
+        
+        <item
             android:id="@+id/menu_item_change_ip"
             android:icon="@drawable/ic_change_ip"
             android:title="Ubah Host"></item>
+
     </group>
 
     <item android:title="Others">

@@ -6,23 +6,30 @@ import com.patrolsystemapp.Model.Schedule;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ConfirmShiftCall {
-    enum RequestStatus {
+public class ConfirmShiftRequest {
+    public enum RequestStatus {
         LOADING,
         DONE,
         FAILED
     }
 
+    String dateString;
     private Schedule schedule;
     private Call<JsonObject> call;
     RequestStatus requestStatus;
     Callback<JsonObject> callback;
 
-    public ConfirmShiftCall(Schedule schedule, Call<JsonObject> call) {
+    public ConfirmShiftRequest(Schedule schedule, Call<JsonObject> call) {
+        dateString = new SimpleDateFormat("d MMM yyyy, HH:mm", new Locale("id", "ID")).format(new Date());
         this.schedule = schedule;
         requestStatus = RequestStatus.LOADING;
         callback = new Callback<JsonObject>() {
@@ -56,7 +63,19 @@ public class ConfirmShiftCall {
         call.enqueue(callback);
     }
 
-    private void retry(Call<JsonObject> call) {
+    public void retry(Call<JsonObject> call) {
         call.clone().enqueue(callback);
+    }
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public String getDateString() {
+        return dateString;
+    }
+
+    public RequestStatus getRequestStatus() {
+        return requestStatus;
     }
 }

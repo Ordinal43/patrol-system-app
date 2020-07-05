@@ -19,9 +19,8 @@
     <color name="card_detailing">#eee</color>
 
     <!-- for recycler -->
-    <color name="failed">#E53935</color>
-    <color name="success">#43A047</color>
-    <color name="pending">#FFB300</color>
+    <color name="belum">#E53935</color>
+    <color name="sudah">#43A047</color>
 
     <!-- for image picker -->
     <color name="ucrop_color_toolbar">@color/colorPrimary</color>

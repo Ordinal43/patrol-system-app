@@ -49,7 +49,7 @@
             android:name=".ConfirmShiftActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".FinishConfirmActivity"
+            android:name=".LoadingConfirmShiftActivity"
             android:screenOrientation="portrait" />
 
     </application>

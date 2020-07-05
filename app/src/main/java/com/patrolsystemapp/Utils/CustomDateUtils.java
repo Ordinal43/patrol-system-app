@@ -2,6 +2,7 @@ package com.patrolsystemapp.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class CustomDateUtils {
 
@@ -21,7 +22,7 @@ public class CustomDateUtils {
      * @param end    interval end
      * @return true    true if the given hour is between
      */
-    public boolean isHourInInterval(String target, String start, String end) {
+    public static boolean isHourInInterval(String target, String start, String end) {
         if (start.compareTo(end) < 0)
             return ((target.compareTo(start) >= 0)
                     && (target.compareTo(end) <= 0));
@@ -34,8 +35,12 @@ public class CustomDateUtils {
      * @param end   interval end
      * @return true    true if the current hour is between
      */
-    public boolean isNowInInterval(String start, String end) {
+    public static boolean isNowInInterval(String start, String end) {
         return isHourInInterval
                 (CustomDateUtils.getCurrentHour(), start, end);
+    }
+
+    public static boolean isDateBetween(Date target, Date start, Date end) {
+        return !target.before(start) && !target.after(end);
     }
 }

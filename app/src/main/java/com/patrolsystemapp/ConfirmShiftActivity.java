@@ -253,7 +253,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 if (currentFile.equals(iterator.getTag())) {
                     // reset the tag
                     iterator.setTag(null);
-                    listFiles.get(idx).delete();
                     listFiles.remove(idx);
                     break;
                 }

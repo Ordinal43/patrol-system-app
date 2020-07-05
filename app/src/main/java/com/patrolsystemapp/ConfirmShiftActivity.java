@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,7 +15,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.patrolsystemapp.CustomLayout.SquareImageView;
 import com.patrolsystemapp.Dialog.CancelConfirmDialog;
 import com.patrolsystemapp.Model.Scan;
@@ -237,7 +238,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 if (currentFile.equals(iterator.getTag())) {
                     // reset the tag
                     iterator.setTag(null);
-                    listFiles.get(idx).delete();
                     listFiles.remove(idx);
                     break;
                 }

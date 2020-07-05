@@ -164,7 +164,6 @@ public class LoadingScanResActivity extends AppCompatActivity {
             String cleanedString = scanResult.replaceAll("\\P{Print}", "");
             boolean confirmed = false;
             int receivedAmount = 0;
-            CustomDateUtils customDateUtils = new CustomDateUtils();
 
             while (receivedAmount < listShifts.length()) {
                 Future<ScheduleWithDerived> resultFuture = completionService.take();
@@ -174,7 +173,7 @@ public class LoadingScanResActivity extends AppCompatActivity {
                     String derivedKey = scheduleWithDerived.getDerivedKey();
                     System.out.println("Derived key: " + scheduleWithDerived.getDerivedKey());
 
-                    boolean isInInterval = customDateUtils.isNowInInterval(matchedSchedule.getTime_start(), matchedSchedule.getTime_end());
+                    boolean isInInterval = CustomDateUtils.isNowInInterval(matchedSchedule.getTime_start(), matchedSchedule.getTime_end());
                     if (cleanedString.equals(derivedKey) && isInInterval) {
                         scanResSchedule = matchedSchedule;
                         confirmed = true;

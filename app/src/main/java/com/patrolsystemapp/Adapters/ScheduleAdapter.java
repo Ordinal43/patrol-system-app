@@ -1,15 +1,16 @@
 package com.patrolsystemapp.Adapters;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.patrolsystemapp.Fragments.ScanHistoryFragment;
 import com.patrolsystemapp.Model.Schedule;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleHolder> {
     private ArrayList<Schedule> scheduleList;
     private Context mContext;
-    private CustomDateUtils customDateUtils = new CustomDateUtils();
 
     public ScheduleAdapter(ArrayList<Schedule> scheduleList, Context mContext) {
         this.scheduleList = scheduleList;
@@ -45,7 +45,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         String times = currentSchedule.getTime_start() + " - " + currentSchedule.getTime_end();
         scheduleHolder.txtTime.setText(times);
 
-        if(!customDateUtils.isNowInInterval(currentSchedule.getTime_start(), currentSchedule.getTime_end())) {
+        if (!CustomDateUtils.isNowInInterval(currentSchedule.getTime_start(), currentSchedule.getTime_end())) {
             scheduleHolder.txtLocation.setTextColor(ContextCompat.getColor(mContext, R.color.colorGrey));
             scheduleHolder.txtTime.setTextColor(ContextCompat.getColor(mContext, R.color.colorGrey));
         }
@@ -61,7 +61,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
 
         scheduleHolder.txtStatus.setText(status);
 
-        if(currentSchedule.getLast_scan() != null) {
+        if (currentSchedule.getLast_scan() != null) {
             String lastScanned = "Terakhir " + currentSchedule.getLast_scan().getScan_time();
             scheduleHolder.txtLastScanned.setText(lastScanned);
         } else {

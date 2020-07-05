@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.patrolsystemapp.Fragments.ScanHistoryFragment;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.Utils.CustomDateUtils;
 

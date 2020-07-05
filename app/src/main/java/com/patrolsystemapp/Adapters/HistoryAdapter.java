@@ -11,9 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.patrolsystemapp.CustomLayout.SquareImageView;
-import com.patrolsystemapp.Model.History;
-import com.patrolsystemapp.Model.Photo;
+import com.patrolsystemapp.CustomLayouts.SquareImageView;
+import com.patrolsystemapp.Models.History;
+import com.patrolsystemapp.Models.Photo;
 import com.patrolsystemapp.R;
 import com.squareup.picasso.Picasso;
 

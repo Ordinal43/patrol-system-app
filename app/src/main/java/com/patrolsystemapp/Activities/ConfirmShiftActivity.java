@@ -1,4 +1,4 @@
-package com.patrolsystemapp;
+package com.patrolsystemapp.Activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,11 +27,12 @@ import com.patrolsystemapp.Apis.ConfirmShift.ConfirmShiftSingleton;
 import com.patrolsystemapp.Apis.ConfirmShiftRequest;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
-import com.patrolsystemapp.CustomLayout.SquareImageView;
-import com.patrolsystemapp.Dialog.CancelConfirmDialog;
-import com.patrolsystemapp.Model.Scan;
-import com.patrolsystemapp.Model.Schedule;
-import com.patrolsystemapp.Model.Status;
+import com.patrolsystemapp.CustomLayouts.SquareImageView;
+import com.patrolsystemapp.Dialogs.CancelConfirmDialog;
+import com.patrolsystemapp.Models.Scan;
+import com.patrolsystemapp.Models.Schedule;
+import com.patrolsystemapp.Models.Status;
+import com.patrolsystemapp.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;

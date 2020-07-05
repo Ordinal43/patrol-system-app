@@ -1,4 +1,4 @@
-package com.patrolsystemapp;
+package com.patrolsystemapp.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.patrolsystemapp.R;
 
 public class FinishConfirmActivity extends AppCompatActivity {
     private static final String METHOD_PATCH = "patch";

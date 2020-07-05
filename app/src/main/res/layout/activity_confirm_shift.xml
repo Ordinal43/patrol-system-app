@@ -59,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.patrolsystemapp.CustomLayout.SquareImageView
+                        <com.patrolsystemapp.CustomLayouts.SquareImageView
                             android:id="@+id/uploadedImagePreview"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

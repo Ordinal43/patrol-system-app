@@ -1,12 +1,11 @@
 package com.patrolsystemapp.Apis;
 
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.Schedule;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

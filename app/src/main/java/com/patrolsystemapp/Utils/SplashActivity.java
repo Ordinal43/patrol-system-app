@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.patrolsystemapp.MainActivity;
+import com.patrolsystemapp.Activities.MainActivity;
 
 import java.util.concurrent.TimeUnit;
 

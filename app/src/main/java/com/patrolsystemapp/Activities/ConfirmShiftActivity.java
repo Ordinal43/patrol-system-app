@@ -23,8 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Apis.ConfirmShift.ConfirmShiftSingleton;
-import com.patrolsystemapp.Apis.ConfirmShiftRequest;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.CustomLayouts.SquareImageView;
@@ -35,6 +33,9 @@ import com.patrolsystemapp.Models.Status;
 import com.patrolsystemapp.R;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
@@ -366,8 +369,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 param_status_node_id
         );
 
-        ConfirmShiftRequest confirmShiftRequest = new ConfirmShiftRequest(matchedSchedule, call);
-        ConfirmShiftSingleton.getConfirmShiftRequests().add(confirmShiftRequest);
+        call.enqueue(callback);
 
         Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);
@@ -387,5 +389,35 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void closeDialog() {
 
+    }
+
+    Callback<JsonObject> callback = new Callback<JsonObject>() {
+        @Override
+        public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+            try {
+                assert response.body() != null;
+                String jsonString = response.body().toString();
+                JSONObject obj = new JSONObject(jsonString);
+                System.out.println(obj.toString(2));
+                boolean isErr = (Boolean) obj.get("error");
+
+                if (isErr) {
+                    Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+            retry(call);
+            t.printStackTrace();
+        }
+    };
+
+    private void retry(Call<JsonObject> call) {
+        call.clone().enqueue(callback);
     }
 }

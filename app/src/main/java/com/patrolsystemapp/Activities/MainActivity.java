@@ -29,7 +29,6 @@ import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
 import com.patrolsystemapp.Dialogs.ChangeIpDialog;
 import com.patrolsystemapp.Fragments.HomeFragment;
-import com.patrolsystemapp.Fragments.PendingRequestFragment;
 import com.patrolsystemapp.PatrolApp;
 import com.patrolsystemapp.R;
 
@@ -137,13 +136,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .beginTransaction()
                         .addToBackStack(null)
                         .replace(R.id.fragmentContainer, new HomeFragment(), "HomeFragment")
-                        .commit();
-                break;
-            case R.id.menu_item_request_list:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.fragmentContainer, new PendingRequestFragment(), "PendingRequestFragment")
                         .commit();
                 break;
             case R.id.menu_item_change_ip:

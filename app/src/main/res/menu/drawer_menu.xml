@@ -7,11 +7,6 @@
             android:id="@+id/menu_item_home"
             android:icon="@drawable/ic_home"
             android:title="Home"></item>
-
-        <item
-            android:id="@+id/menu_item_request_list"
-            android:icon="@drawable/ic_pending_requests"
-            android:title="Request berjalan"></item>
         
         <item
             android:id="@+id/menu_item_change_ip"

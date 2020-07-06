@@ -1,4 +1,4 @@
-package com.patrolsystemapp.Model;
+package com.patrolsystemapp.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;

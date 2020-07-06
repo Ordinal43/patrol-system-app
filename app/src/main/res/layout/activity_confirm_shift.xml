@@ -59,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <com.patrolsystemapp.CustomLayout.SquareImageView
+                        <com.patrolsystemapp.CustomLayouts.SquareImageView
                             android:id="@+id/uploadedImagePreview"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                             android:layout_alignParentRight="true"
                             android:layout_marginTop="15dp"
                             android:layout_marginRight="5dp"
-                            android:backgroundTint="@color/belum"
+                            android:backgroundTint="@color/failed"
                             app:fabSize="mini"
                             app:borderWidth="0dp" />
                     </RelativeLayout>

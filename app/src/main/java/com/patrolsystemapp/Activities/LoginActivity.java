@@ -1,4 +1,4 @@
-package com.patrolsystemapp;
+package com.patrolsystemapp.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +19,8 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
-import com.patrolsystemapp.Dialog.ChangeIpDialog;
+import com.patrolsystemapp.Dialogs.ChangeIpDialog;
+import com.patrolsystemapp.R;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;

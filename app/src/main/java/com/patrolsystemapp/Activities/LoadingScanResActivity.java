@@ -1,4 +1,4 @@
-package com.patrolsystemapp;
+package com.patrolsystemapp.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.Schedule;
+import com.patrolsystemapp.R;
 import com.patrolsystemapp.Utils.Crypto;
 import com.patrolsystemapp.Utils.CustomDateUtils;
 

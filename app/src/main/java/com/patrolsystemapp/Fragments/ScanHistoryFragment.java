@@ -25,9 +25,9 @@ import com.google.gson.JsonObject;
 import com.patrolsystemapp.Adapters.HistoryAdapter;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
-import com.patrolsystemapp.Model.History;
-import com.patrolsystemapp.Model.Photo;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.History;
+import com.patrolsystemapp.Models.Photo;
+import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.R;
 
 import org.jetbrains.annotations.NotNull;

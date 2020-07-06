@@ -1,4 +1,4 @@
-package com.patrolsystemapp.Dialog;
+package com.patrolsystemapp.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

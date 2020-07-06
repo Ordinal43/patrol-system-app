@@ -1,10 +1,14 @@
-package com.patrolsystemapp;
+package com.patrolsystemapp.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,21 +24,38 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.patrolsystemapp.CustomLayout.SquareImageView;
-import com.patrolsystemapp.Dialog.CancelConfirmDialog;
-import com.patrolsystemapp.Model.Scan;
-import com.patrolsystemapp.Model.Schedule;
-import com.patrolsystemapp.Model.Status;
+import com.google.gson.JsonObject;
+import com.patrolsystemapp.Apis.NetworkClient;
+import com.patrolsystemapp.Apis.UploadApis;
+import com.patrolsystemapp.CustomLayouts.SquareImageView;
+import com.patrolsystemapp.Dialogs.CancelConfirmDialog;
+import com.patrolsystemapp.Models.Scan;
+import com.patrolsystemapp.Models.Schedule;
+import com.patrolsystemapp.Models.Status;
+import com.patrolsystemapp.R;
 import com.squareup.picasso.Picasso;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
-    private float CURRENT_DENSITY;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
+public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
+    private static final String TAG = "ConfirmShiftActivity";
+    private float CURRENT_DENSITY;
     Schedule matchedSchedule;
+
+    private SharedPreferences sharedPrefs;
 
     // shift not done layouts
     private LinearLayout linearLayoutConfirmShift;
@@ -57,6 +78,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
 
+    Handler handler = new Handler();
+    Runnable runnable = null;
+
     @Override
     public void onBackPressed() {
         openDialog();
@@ -75,6 +99,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initWidgets() {
+        sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
+
         CURRENT_DENSITY = getResources().getDisplayMetrics().density;
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
         linearLayoutConfirmShift.setVisibility(View.GONE);
@@ -324,12 +350,34 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
 
-        Intent intent = new Intent(this, LoadingConfirmShiftActivity.class);
-        intent.putExtra("matchedSchedule", matchedSchedule);
-        intent.putExtra("listFiles", listFiles);
-        intent.putExtra("statusId", statusId);
-        intent.putExtra("message", message);
+        List<MultipartBody.Part> param_list_images = new ArrayList<>();
+        int idx = 0;
+        for (File file : listFiles) {
+            RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
+            MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "]", file.getName(), requestBody);
+            param_list_images.add(image);
+            idx++;
+        }
 
+        RequestBody param_token = RequestBody.create(sharedPrefs.getString("token", ""), MediaType.parse("multipart/form-data"));
+        RequestBody param_id = RequestBody.create(matchedSchedule.getId(), MediaType.parse("multipart/form-data"));
+        RequestBody param_message = RequestBody.create(message, MediaType.parse("multipart/form-data"));
+        RequestBody param_status_node_id = RequestBody.create(statusId, MediaType.parse("multipart/form-data"));
+
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        Call<JsonObject> call = uploadApis.uploadConfirmation(
+                param_list_images,
+                param_token,
+                param_id,
+                param_message,
+                param_status_node_id
+        );
+
+        call.enqueue(callback);
+
+        Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);
         finish();
     }
@@ -347,5 +395,40 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void closeDialog() {
 
+    }
+
+    Callback<JsonObject> callback = new Callback<JsonObject>() {
+        @Override
+        public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+            if (runnable != null) handler.removeCallbacks(runnable);
+            try {
+                assert response.body() != null;
+                String jsonString = response.body().toString();
+                JSONObject obj = new JSONObject(jsonString);
+                System.out.println(obj.toString(2));
+                boolean isErr = (Boolean) obj.get("error");
+
+                if (isErr) {
+                    Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+            if (runnable != null) handler.removeCallbacks(runnable);
+            Log.d(TAG, "Retrying...");
+            retry(call);
+            t.printStackTrace();
+        }
+    };
+
+    private void retry(Call<JsonObject> call) {
+        handler.postDelayed(runnable = () -> {
+            call.clone().enqueue(callback);
+        }, 30 * 1000);
     }
 }

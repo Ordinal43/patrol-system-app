@@ -1,4 +1,4 @@
-package com.patrolsystemapp.CustomLayout;
+package com.patrolsystemapp.CustomLayouts;
 
 import android.content.Context;
 import android.graphics.Canvas;

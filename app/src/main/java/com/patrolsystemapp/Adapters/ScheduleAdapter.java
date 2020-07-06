@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.patrolsystemapp.Fragments.ScanHistoryFragment;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.Utils.CustomDateUtils;
 
@@ -53,7 +53,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         String status;
         int countScanned = Integer.parseInt(scheduleList.get(i).getCountScanned());
         if (countScanned == 0) {
-            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.belum));
+            scheduleHolder.txtStatus.setTextColor(ContextCompat.getColor(mContext, R.color.failed));
             status = "Belum diperiksa";
         } else {
             status = "Diperiksa " + countScanned + " kali";

@@ -37,19 +37,19 @@
             tools:replace="screenOrientation" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LoadingScanResActivity"
+            android:name=".Activities.LoadingScanResActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ConfirmShiftActivity"
+            android:name=".Activities.ConfirmShiftActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LoadingConfirmShiftActivity"
+            android:name=".Activities.FinishConfirmActivity"
             android:screenOrientation="portrait" />
 
     </application>

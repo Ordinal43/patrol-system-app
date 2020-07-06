@@ -7,11 +7,12 @@
             android:id="@+id/menu_item_home"
             android:icon="@drawable/ic_home"
             android:title="Home"></item>
-
+        
         <item
             android:id="@+id/menu_item_change_ip"
             android:icon="@drawable/ic_change_ip"
             android:title="Ubah Host"></item>
+
     </group>
 
     <item android:title="Others">

@@ -27,7 +27,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.patrolsystemapp.Adapters.ScheduleAdapter;
 import com.patrolsystemapp.Apis.NetworkClient;
 import com.patrolsystemapp.Apis.UploadApis;
-import com.patrolsystemapp.Model.Schedule;
+import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.Utils.Crypto;
 

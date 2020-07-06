@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,6 +51,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class ConfirmShiftActivity extends AppCompatActivity implements View.OnClickListener, CancelConfirmDialog.CancelUploadDialogListener {
+    private static final String TAG = "ConfirmShiftActivity";
     private float CURRENT_DENSITY;
     Schedule matchedSchedule;
 
@@ -74,6 +77,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
+
+    Handler handler = new Handler();
+    Runnable runnable = null;
 
     @Override
     public void onBackPressed() {
@@ -394,6 +400,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     Callback<JsonObject> callback = new Callback<JsonObject>() {
         @Override
         public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+            if (runnable != null) handler.removeCallbacks(runnable);
             try {
                 assert response.body() != null;
                 String jsonString = response.body().toString();
@@ -412,12 +419,16 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         @Override
         public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+            if (runnable != null) handler.removeCallbacks(runnable);
+            Log.d(TAG, "Retrying...");
             retry(call);
             t.printStackTrace();
         }
     };
 
     private void retry(Call<JsonObject> call) {
-        call.clone().enqueue(callback);
+        handler.postDelayed(runnable = () -> {
+            call.clone().enqueue(callback);
+        }, 30 * 1000);
     }
 }

@@ -399,7 +399,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     Callback<JsonObject> callback = new Callback<JsonObject>() {
         @Override
-        public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+        public void onResponse(@NotNull Call<JsonObject> call,
+                               @NotNull Response<JsonObject> response) {
+
             if (runnable != null) handler.removeCallbacks(runnable);
             try {
                 assert response.body() != null;
@@ -418,7 +420,8 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         }
 
         @Override
-        public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+        public void onFailure(@NotNull Call<JsonObject> call,
+                              @NotNull Throwable t) {
             if (runnable != null) handler.removeCallbacks(runnable);
             Log.d(TAG, "Retrying...");
             retry(call);

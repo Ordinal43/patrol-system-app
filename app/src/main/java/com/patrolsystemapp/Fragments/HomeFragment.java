@@ -14,6 +14,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +51,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HomeFragment";
     View rootView;
     private SharedPreferences sharedPrefs;
     private RecyclerView rcyViewSchedule;
@@ -262,14 +265,11 @@ public class HomeFragment extends Fragment {
 
                 int received = 0;
                 while (received < listSchedule.size()) {
-                    Future<String> resultFuture = null;
+                    Future<String> resultFuture;
                     try {
                         resultFuture = completionService.take();
                         String derived = resultFuture.get();
-                        System.out.println(listSchedule.get(received).getId());
-                        System.out.println(listSchedule.get(received).getRoom());
-                        System.out.println("Key is : " + derived);
-                        System.out.println();
+                        Log.d(TAG, "================== Key is : " + derived);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

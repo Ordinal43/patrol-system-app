@@ -26,8 +26,6 @@ public class FinishConfirmActivity extends AppCompatActivity {
     }
 
     private void initWidgets() {
-        LinearLayout linearLayoutSuccessUpload = findViewById(R.id.layoutSuccessUpload);
-
         Button btnToHome = findViewById(R.id.btnToHome);
         btnToHome.setOnClickListener(v -> toHome());
     }

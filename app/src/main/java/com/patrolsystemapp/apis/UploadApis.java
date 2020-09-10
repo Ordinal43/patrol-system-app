@@ -36,6 +36,7 @@ public interface UploadApis {
     @Multipart
     @POST("guard/users/submitScan")
     Call<JsonObject> uploadConfirmation(@Part List<MultipartBody.Part> photos,
+                                        @Part List<MultipartBody.Part> times,
                                         @Part("token") RequestBody token,
                                         @Part("id") RequestBody id,
                                         @Part("message") RequestBody message,

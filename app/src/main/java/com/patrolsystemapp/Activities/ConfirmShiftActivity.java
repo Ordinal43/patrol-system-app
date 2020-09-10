@@ -39,7 +39,9 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -349,13 +351,20 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         Status selectedStatus = (Status) spnStatus.getSelectedItem();
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         List<MultipartBody.Part> param_list_images = new ArrayList<>();
+        List<MultipartBody.Part> param_list_time = new ArrayList<>();
         int idx = 0;
         for (File file : listFiles) {
-            RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
-            MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "]", file.getName(), requestBody);
-            param_list_images.add(image);
+            if (file.exists()) {
+                RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
+                MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "][file]", file.getName(), requestBody);
+                param_list_images.add(image);
+
+                MultipartBody.Part time = MultipartBody.Part.createFormData("photos[" + idx + "][photo_time]", df.format(new Date(file.lastModified())));
+                param_list_time.add(time);
+            }
             idx++;
         }
 
@@ -369,6 +378,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
         Call<JsonObject> call = uploadApis.uploadConfirmation(
                 param_list_images,
+                param_list_time,
                 param_token,
                 param_id,
                 param_message,
@@ -411,10 +421,11 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 boolean isErr = (Boolean) obj.get("error");
 
                 if (isErr) {
+                    // Move to another page? show notif?
                     Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Terjadi kesalahan internal pada sistem! Silahkan hubungi admin.", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         }

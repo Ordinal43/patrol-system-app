@@ -1,4 +1,4 @@
-package com.patrolsystemapp.Apis;
+package com.patrolsystemapp.apis;
 
 import com.google.gson.JsonObject;
 

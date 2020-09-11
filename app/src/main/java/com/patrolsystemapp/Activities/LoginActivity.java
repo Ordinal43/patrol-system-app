@@ -17,8 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.Apis.NetworkClient;
-import com.patrolsystemapp.Apis.UploadApis;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 import com.patrolsystemapp.Dialogs.ChangeIpDialog;
 import com.patrolsystemapp.R;
 

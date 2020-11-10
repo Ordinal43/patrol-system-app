@@ -351,7 +351,7 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         Status selectedStatus = (Status) spnStatus.getSelectedItem();
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         List<MultipartBody.Part> param_list_images = new ArrayList<>();
         List<MultipartBody.Part> param_list_time = new ArrayList<>();

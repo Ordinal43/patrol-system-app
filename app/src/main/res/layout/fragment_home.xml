@@ -102,16 +102,17 @@
 
     </RelativeLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_scan"
-        app:fabSize="normal"
-        android:elevation="6dp"
-        android:backgroundTint="@color/colorPrimary"
-        app:borderWidth="0dp"
+        android:layout_gravity="bottom|end"
+        android:text="Scan QR"
+        android:theme="@style/MyMaterialTheme"
+        app:backgroundTint="@color/colorPrimaryLight"
+        app:iconTint="@color/colorWhite"
+        android:textColor="@color/colorWhite"
+        app:icon="@drawable/ic_scan"
         android:id="@+id/fragmentHome_btnScan" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

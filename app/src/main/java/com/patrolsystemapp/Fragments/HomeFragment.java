@@ -5,16 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,16 +12,26 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.patrolsystemapp.Adapters.ScheduleAdapter;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
 import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.R;
 import com.patrolsystemapp.Utils.Crypto;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -56,7 +56,7 @@ public class HomeFragment extends Fragment {
     private SharedPreferences sharedPrefs;
     private RecyclerView rcyViewSchedule;
     private ScheduleAdapter scheduleAdapter;
-    private FloatingActionButton fabScan;
+    private ExtendedFloatingActionButton fabScan;
 
     private SwipeRefreshLayout refreshLayout;
     private LinearLayout linearLayoutError;
@@ -246,7 +246,7 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void run() {
-            if(this.listSchedule.size() > 0) {
+            if (this.listSchedule.size() > 0) {
                 ExecutorService executor = Executors.newFixedThreadPool(this.listSchedule.size());
                 CompletionService<String> completionService =
                         new ExecutorCompletionService<>(executor);

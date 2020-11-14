@@ -1,7 +1,6 @@
 package com.patrolsystemapp.apis;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.patrolsystemapp.BuildConfig;
 
@@ -14,8 +13,7 @@ public class NetworkClient {
     private static Retrofit retrofit;
 
     public static Retrofit getRetrofit(Context context) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
-        String apiUrl = "http://" + sharedPrefs.getString("ip_address", "") + "/api/";
+        String apiUrl = "http://patrolee.fti.ukdw.ac.id/api/";
 
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
 

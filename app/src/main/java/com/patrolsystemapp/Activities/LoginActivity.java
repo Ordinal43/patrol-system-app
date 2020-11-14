@@ -5,22 +5,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.gson.JsonObject;
+import com.patrolsystemapp.R;
 import com.patrolsystemapp.apis.NetworkClient;
 import com.patrolsystemapp.apis.UploadApis;
-import com.patrolsystemapp.Dialogs.ChangeIpDialog;
-import com.patrolsystemapp.R;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -31,16 +30,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 
-public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.IpDialogListener {
+public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private SharedPreferences sharedPrefs;
     private Context mContext;
     private FrameLayout frameLoading;
     private EditText edtUsername;
     private EditText edtPassword;
-
-    private TextView txtIp;
-    private String ipAddress;
 
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -83,21 +79,6 @@ public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.I
         edtPassword = findViewById(R.id.edtPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
 
-        txtIp = findViewById(R.id.txtIp);
-
-        if (!sharedPrefs.contains("ip_address")) {
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putString("ip_address", "1.2.3.4:8000");
-            editor.apply();
-        }
-
-        ipAddress = sharedPrefs.getString("ip_address", "");
-        txtIp.setText(ipAddress);
-
-        Button btnIp = findViewById(R.id.btnIp);
-
-        btnIp.setOnClickListener(v -> openDialog());
-
         edtUsername.requestFocus();
 
         btnLogin.setOnClickListener(v -> {
@@ -110,14 +91,6 @@ public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.I
                 login(username, password);
             }
         });
-    }
-
-    private void openDialog() {
-        ChangeIpDialog changeIpDialog = new ChangeIpDialog();
-        Bundle b = new Bundle();
-        b.putString("ipAddress", ipAddress);
-        changeIpDialog.setArguments(b);
-        changeIpDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void login(String username, String password) {
@@ -183,24 +156,5 @@ public class LoginActivity extends AppCompatActivity implements ChangeIpDialog.I
                 });
             }
         });
-    }
-
-    @Override
-    public void confirmDialog(String ip) {
-        ipAddress = ip;
-        txtIp.setText(ipAddress);
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString("ip_address", ipAddress);
-        editor.apply();
-    }
-
-    @Override
-    public void invalidUrlWarn() {
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "URL Invalid!", Toast.LENGTH_SHORT).show());
-    }
-
-    @Override
-    public void closeDialog() {
-        // do nothing
     }
 }

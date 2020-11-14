@@ -25,12 +25,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
-import com.patrolsystemapp.Dialogs.ChangeIpDialog;
 import com.patrolsystemapp.Fragments.HomeFragment;
 import com.patrolsystemapp.PatrolApp;
 import com.patrolsystemapp.R;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -41,7 +40,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ChangeIpDialog.IpDialogListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivity";
     private Context mContext;
 
@@ -123,9 +122,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawer.closeDrawer(GravityCompat.START);
 
-        if (previousMenuItem.equals(currentMenuItem) &&
-                currentMenuItem.getItemId() != R.id.menu_item_change_ip)
-            return true;
         return navigateTo(menuItem);
     }
 
@@ -138,22 +134,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .replace(R.id.fragmentContainer, new HomeFragment(), "HomeFragment")
                         .commit();
                 break;
-            case R.id.menu_item_change_ip:
-                openDialog();
-                break;
             case R.id.menu_item_logout:
                 logout();
                 break;
         }
         return true;
-    }
-
-    private void openDialog() {
-        ChangeIpDialog changeIpDialog = new ChangeIpDialog();
-        Bundle b = new Bundle();
-        b.putString("ipAddress", ipAddress);
-        changeIpDialog.setArguments(b);
-        changeIpDialog.show(getSupportFragmentManager(), "IP Dialog");
     }
 
     private void logout() {
@@ -258,30 +243,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         PatrolApp.activityPaused();
-    }
-
-    @Override
-    public void confirmDialog(String ip) {
-        navigationView.setCheckedItem(previousMenuItem);
-        currentMenuItem = navigationView.getCheckedItem();
-
-        if (!ipAddress.equals(ip)) {
-            ipAddress = ip;
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putString("ip_address", ipAddress);
-            editor.apply();
-            navigateTo(previousMenuItem);
-        }
-    }
-
-    @Override
-    public void invalidUrlWarn() {
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "URL Invalid!", Toast.LENGTH_SHORT).show());
-    }
-
-    @Override
-    public void closeDialog() {
-        navigationView.setCheckedItem(previousMenuItem);
-        currentMenuItem = navigationView.getCheckedItem();
     }
 }

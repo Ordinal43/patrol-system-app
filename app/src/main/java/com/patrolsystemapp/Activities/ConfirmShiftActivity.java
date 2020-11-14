@@ -24,18 +24,22 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.patrolsystemapp.apis.NetworkClient;
-import com.patrolsystemapp.apis.UploadApis;
 import com.patrolsystemapp.CustomLayouts.SquareImageView;
 import com.patrolsystemapp.Dialogs.CancelConfirmDialog;
 import com.patrolsystemapp.Models.Scan;
 import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.Models.Status;
 import com.patrolsystemapp.R;
+import com.patrolsystemapp.apis.NetworkClient;
+import com.patrolsystemapp.apis.UploadApis;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -79,6 +83,10 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
     private ArrayList<File> listFiles = new ArrayList<>();
     private File currentFile = null;
+
+    private List<Status> statusList;
+    private ArrayAdapter<Status> statusAdapter;
+    private Button btnRetryGetStatus;
 
     Handler handler = new Handler();
     Runnable runnable = null;
@@ -129,21 +137,19 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         linearLayoutTakePhotos.setVisibility(View.GONE);
 
         spnStatus = findViewById(R.id.spnStatus);
-        List<Status> statusList = new ArrayList<>();
+        btnRetryGetStatus = findViewById(R.id.btnRetryGetStatus);
+        btnRetryGetStatus.setOnClickListener(v -> {
+            getListStatus();
+        });
 
-        Status aman = new Status("1", "Aman");
-        Status mencurigakan = new Status("2", "Mencurigakan");
-        Status tdkAman = new Status("3", "Tidak Aman");
+        btnRetryGetStatus.setVisibility(View.GONE);
 
-        statusList.add(aman);
-        statusList.add(mencurigakan);
-        statusList.add(tdkAman);
-
-        ArrayAdapter<Status> adapter = new ArrayAdapter<>(
+        statusList = new ArrayList<>();
+        statusAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, statusList);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnStatus.setAdapter(adapter);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnStatus.setAdapter(statusAdapter);
+        getListStatus();
 
         edtMessage = findViewById(R.id.edtMessage);
 
@@ -390,6 +396,65 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         Intent intent = new Intent(this, FinishConfirmActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void getListStatus() {
+        String param_token = sharedPrefs.getString("token", "");
+
+        Retrofit retrofit = NetworkClient.getRetrofit(this);
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        Call<JsonObject> call = uploadApis.getListStatus(param_token);
+
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                assert response.body() != null;
+                String jsonString = response.body().toString();
+                try {
+                    JSONObject obj = new JSONObject(jsonString);
+                    System.out.println(obj.toString(2));
+                    boolean isErr = (Boolean) obj.get("error");
+
+                    if (!isErr) {
+                        setListStatus(obj.getJSONObject("data").getJSONArray("status_node"));
+                    } else {
+                        throw new Exception("Error API!");
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Daftar kondisi lokasi gagal diambil! silahkan coba lagi", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                    spnStatus.setVisibility(View.GONE);
+                    btnRetryGetStatus.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                t.printStackTrace();
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Daftar kondisi lokasi gagal diambil! silahkan coba lagi", Toast.LENGTH_LONG).show();
+                    spnStatus.setVisibility(View.GONE);
+                    btnRetryGetStatus.setVisibility(View.VISIBLE);
+                });
+            }
+        });
+    }
+
+    public void setListStatus(JSONArray listStatus) throws JSONException {
+        statusList.clear();
+        Gson gson = new GsonBuilder().create();
+
+        if (listStatus.length() > 0) {
+            for (int i = 0; i < listStatus.length(); i++) {
+                JSONObject row = listStatus.getJSONObject(i);
+                Status status = gson.fromJson(row.toString(), Status.class);
+                statusList.add(status);
+            }
+            statusAdapter.notifyDataSetChanged();
+            spnStatus.setVisibility(View.VISIBLE);
+            btnRetryGetStatus.setVisibility(View.GONE);
+        }
     }
 
     private void openDialog() {

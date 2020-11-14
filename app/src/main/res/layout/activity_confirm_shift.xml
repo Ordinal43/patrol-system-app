@@ -172,6 +172,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
+                    <Button
+                        android:id="@+id/btnRetryGetStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="muat ulang"
+                        app:icon="@drawable/ic_refresh"
+                        style="@style/Widget.MaterialComponents.Button.TextButton.Icon" />
+
                     <EditText
                         android:id="@+id/edtMessage"
                         android:layout_width="match_parent"

@@ -29,6 +29,9 @@ public interface UploadApis {
     @GET("guard/users/shifts")
     Call<JsonObject> getListShift(@Query("token") String token);
 
+    @GET("guard/users/getMasterData")
+    Call<JsonObject> getListStatus(@Query("token") String token);
+
     @GET("guard/users/viewHistoryScan/{id}")
     Call<JsonObject> getListHistory(@Path(value = "id") String id,
                                     @Query("token") String token);

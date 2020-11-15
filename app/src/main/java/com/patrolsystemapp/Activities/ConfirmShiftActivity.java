@@ -7,12 +7,15 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -33,6 +36,8 @@ import com.patrolsystemapp.Models.Scan;
 import com.patrolsystemapp.Models.Schedule;
 import com.patrolsystemapp.Models.Status;
 import com.patrolsystemapp.R;
+import com.patrolsystemapp.Utils.CompressFileUtils;
+import com.patrolsystemapp.Utils.CustomDateUtils;
 import com.patrolsystemapp.apis.NetworkClient;
 import com.patrolsystemapp.apis.UploadApis;
 import com.squareup.picasso.Picasso;
@@ -43,8 +48,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -88,6 +98,12 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     private ArrayAdapter<Status> statusAdapter;
     private Button btnRetryGetStatus;
 
+    private SimpleDateFormat df;
+    private Date dateStart;
+    private Date dateEnd;
+
+    private FrameLayout frameLoading;
+
     Handler handler = new Handler();
     Runnable runnable = null;
 
@@ -102,14 +118,27 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_confirm_shift);
         matchedSchedule = (Schedule) getIntent().getSerializableExtra("matchedSchedule");
 
-        initWidgets();
+        try {
+            initWidgets();
+        } catch (ParseException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
         linearLayoutConfirmShift.setVisibility(View.VISIBLE);
         linearLayoutTakePhotos.setVisibility(View.VISIBLE);
     }
 
-    private void initWidgets() {
+    private void initWidgets() throws ParseException {
         sharedPrefs = getSharedPreferences("patrol_app", Context.MODE_PRIVATE);
+        df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        frameLoading = findViewById(R.id.frameLoadingCompress);
+        frameLoading.setVisibility(View.GONE);
+
+        String strStart = matchedSchedule.getDate() + " " + matchedSchedule.getTime_start() + ":00";
+        String strEnd = matchedSchedule.getDate() + " " + matchedSchedule.getTime_end() + ":00";
+        dateStart = df.parse(strStart);
+        dateEnd = df.parse(strEnd);
 
         CURRENT_DENSITY = getResources().getDisplayMetrics().density;
         linearLayoutConfirmShift = findViewById(R.id.layoutConfirmShift);
@@ -194,10 +223,9 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         if (thumbnail != null && thumbnail.getDrawable() != null) {
             // if ImageView tag is null, open ImagePicker
             if (thumbnail.getTag() == null) {
+                // don't do anything to image since it will change last_modified time
                 ImagePicker.Companion.with(this)
-                        .compress(512)
-                        .maxResultSize(1920, 1920)
-//                        .maxResultSize(620, 620)
+                        .saveDir(new File(Environment.getExternalStorageDirectory(), "ImagePicker"))
                         .start();
             } else {
                 currentFile = (File) thumbnail.getTag();
@@ -220,9 +248,45 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
+            frameLoading.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
             //You can get File object from intent
             currentFile = ImagePicker.Companion.getFile(data);
-            Uri currentUri = Uri.fromFile(currentFile);
+
+            Date fileLastModified = new Date(currentFile.lastModified());
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                try {
+                    BasicFileAttributes attr = Files.readAttributes(currentFile.toPath(), BasicFileAttributes.class);
+                    fileLastModified = new Date(attr.creationTime().toMillis());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            assert currentFile != null;
+
+            if (dateStart.getTime() > dateEnd.getTime()) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(dateEnd);
+                c.add(Calendar.DATE, 1);
+                dateEnd = c.getTime();
+            }
+
+
+            System.out.println("last modified: " + df.format(fileLastModified));
+            System.out.println("start: " + df.format(dateStart));
+            System.out.println("end: " + df.format(dateEnd));
+
+            boolean isBetween = CustomDateUtils.isDateBetween(fileLastModified, dateStart, dateEnd);
+            if (!isBetween) {
+                Toast.makeText(this, "Tanggal gambar tidak sesuai jadwal!", Toast.LENGTH_LONG).show();
+                frameLoading.setVisibility(View.GONE);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                return;
+            }
+
+            Uri currentUri = data.getData();
 
             int width = (int) (imagePreview.getWidth() * CURRENT_DENSITY);
             int height = (int) (imagePreview.getHeight() * CURRENT_DENSITY);
@@ -251,17 +315,27 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 }
             }
 
-            String filePath = ImagePicker.Companion.getFilePath(data);
-            // DO NOT use currentFile since it will add the reference instead
-            assert filePath != null;
-            listFiles.add(new File(filePath));
+//            String filePath = ImagePicker.Companion.getFilePath(data);
+            handler.post(() -> compressImage(ImagePicker.Companion.getFilePath(data), currentFile.getName()));
+
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Toast.makeText(this, ImagePicker.Companion.getError(data), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void compressImage(String filePath, String fileName) {
+        String compressedPath = CompressFileUtils.resizeAndCompressImage(this, filePath, fileName);
+        File newFile = new File(compressedPath);
+        listFiles.add(newFile);
+
+        runOnUiThread(() -> {
+            frameLoading.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
             if (!btnDeleteImage.isShown()) {
                 btnDeleteImage.show();
             }
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.Companion.getError(data), Toast.LENGTH_SHORT).show();
-        }
+        });
     }
 
     private void deleteImage() {
@@ -357,7 +431,6 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         Status selectedStatus = (Status) spnStatus.getSelectedItem();
         String statusId = selectedStatus.getId();
         String message = edtMessage.getText().toString();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         List<MultipartBody.Part> param_list_images = new ArrayList<>();
         List<MultipartBody.Part> param_list_time = new ArrayList<>();
@@ -365,10 +438,12 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
         for (File file : listFiles) {
             if (file.exists()) {
                 RequestBody requestBody = RequestBody.create(file, MediaType.parse("image/*"));
-                MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "][file]", file.getName(), requestBody);
+                MultipartBody.Part image = MultipartBody.Part.createFormData("photos[" + idx + "][file]",
+                        file.getName(), requestBody);
                 param_list_images.add(image);
 
-                MultipartBody.Part time = MultipartBody.Part.createFormData("photos[" + idx + "][photo_time]", df.format(new Date(file.lastModified())));
+                MultipartBody.Part time = MultipartBody.Part.createFormData("photos[" + idx + "][photo_time]",
+                        df.format(new Date(file.lastModified())));
                 param_list_time.add(time);
             }
             idx++;
@@ -479,18 +554,15 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
 
             if (runnable != null) handler.removeCallbacks(runnable);
             try {
-                assert response.body() != null;
                 String jsonString = response.body().toString();
                 JSONObject obj = new JSONObject(jsonString);
                 System.out.println(obj.toString(2));
                 boolean isErr = (Boolean) obj.get("error");
 
                 if (isErr) {
-                    if(obj.getString("message").equals("there is an incorrect photo_time data")){
+                    if (obj.getString("message").equals("there is an incorrect photo_time data")) {
                         Toast.makeText(getApplicationContext(), "Konfirmasi Gagal. Mohon mengirimkan gambar/foto terkini", Toast.LENGTH_LONG).show();
-                    }
-
-                    else {
+                    } else {
                         // Move to another page? show notif?
                         Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
                     }

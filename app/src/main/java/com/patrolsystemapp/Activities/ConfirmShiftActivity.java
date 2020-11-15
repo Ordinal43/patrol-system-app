@@ -486,8 +486,14 @@ public class ConfirmShiftActivity extends AppCompatActivity implements View.OnCl
                 boolean isErr = (Boolean) obj.get("error");
 
                 if (isErr) {
-                    // Move to another page? show notif?
-                    Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                    if(obj.getString("message").equals("there is an incorrect photo_time data")){
+                        Toast.makeText(getApplicationContext(), "Konfirmasi Gagal. Mohon mengirimkan gambar/foto terkini", Toast.LENGTH_LONG).show();
+                    }
+
+                    else {
+                        // Move to another page? show notif?
+                        Toast.makeText(getApplicationContext(), "Proses konfirmasi gagal! silahkan ulang proses scan kembali.", Toast.LENGTH_LONG).show();
+                    }
                 }
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Terjadi kesalahan internal pada sistem! Silahkan hubungi admin.", Toast.LENGTH_LONG).show();

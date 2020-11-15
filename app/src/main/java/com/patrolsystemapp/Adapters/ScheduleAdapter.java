@@ -41,7 +41,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         scheduleHolder.setIsRecyclable(false);
         Schedule currentSchedule = scheduleList.get(i);
 
-        scheduleHolder.txtLocation.setText(currentSchedule.getRoom());
+        scheduleHolder.txtLocation.setText(currentSchedule.getRoom().toUpperCase());
         String times = currentSchedule.getTime_start() + " - " + currentSchedule.getTime_end();
         scheduleHolder.txtTime.setText(times);
 
